@@ -10,6 +10,17 @@ var handlebars = require('express-handlebars');
 
 var app = express();
 
+function requireHTTPS(req, res, next) {
+  // The 'x-forwarded-proto' check is for Heroku
+  if (!req.secure && req.get('x-forwarded-proto') && 
+            req.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV !== "development") {
+    return res.redirect('https://' + req.get('host') + req.url);
+  } else {
+    next();
+  }
+}
+app.use(requireHTTPS);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.engine('handlebars', handlebars({defaultLayout: 'layout'}));
