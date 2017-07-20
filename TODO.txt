@@ -1,0 +1,6 @@
+WE STILL NEED TO:
+
+- Handle when the user goes out of full screen using escape -> not today
+- Fix how clicking on dropdown counts as a click -> not urgent
+- Fix editor -> Akinyélé
+- Make character settings dynamic

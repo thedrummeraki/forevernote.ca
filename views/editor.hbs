@@ -1,0 +1,547 @@
+<header>
+	<ul id="icon-side-nav" class="side-nav fixed">
+		<li><a title="Bob Benoît" href="#modal2"><img id="avatar-picture" class="material-icons material-sidebar-icon" src="images/avatar.png"></a></li>
+		<!--<li><a title="Search..." href="#"><i class="material-icons material-sidebar-icon">search</i></a></li>-->
+		<li><a title="Need some help?" href="#modal1"><i id="nav-help" class="fa fa-question fa-sidebar-icon" aria-hidden="true"></i></a></li>
+		<li><a title="Settings" href="#modal3"><i class="material-icons material-gear material-sidebar-icon">settings</i></a></li>
+		<li><a title="Logout" href="#logout-modal"><i class="fa fa-sign-out fa-sidebar-icon" aria-hidden="true"></i></a></li>
+	</ul>
+</header>
+<div id="help-cont">
+	<div id="modal1" class="modal">
+		<div class="modal-content">
+			<h4>Help</h4>
+			<p>Need some help getting around with ForeverNote?</p>
+			 <ul class="collapsible" data-collapsible="accordion">
+			    <li>
+			      <div class="collapsible-header"><i class="material-icons">add</i>Creating a course</div>
+			      <div class="collapsible-body"><span>
+			      	The first thing you must do before creating a note is a course. Select the "+" sign next
+			      	to "Courses" on the top left of the window in order to do so.
+			      </span></div>
+			    </li>
+			    <li>
+			      <div class="collapsible-header"><i class="material-icons">add</i>Creating a note</div>
+			      <div class="collapsible-body"><span>
+				    After creating a course, select the "+" sign next to "Notes" on the top left, next to "Courses". You will be prompted
+			      	to enter the note title and the note subject. By doing so, you will be able to create a note. The content of the note may be edited at the right side of the screen.
+			      </span></div>
+			    </li>
+			    <li>
+			      <div class="collapsible-header"><i class="material-icons">delete_forever</i>Deleting courses and notes</div>
+			      <div class="collapsible-body"><span>
+			      	Here is what you should know about deleting content on this site:
+			      	<ul>
+			      		<li>Delete a note: This will completely delete <u>all</u> contents of the note from the website after confirmation. You can delete a note by clicking the options menu next to the note and then clicking on the trash icon of the sub menu that will appear.</li>
+			      		<li>Delete a course: This will completely erase <u>all</u> notes associeted with the course and delete the course, after confirmation. You can delete a course by clicking the options menu next to the course and then clicking on the trash icon of the sub menu that will appear.</li>
+			      	</ul>
+			      </span></div>
+			    </li>
+			    <li>
+			      <div class="collapsible-header"><i class="material-icons">save</i>Saving</div>
+			      <div class="collapsible-body"><span>
+			      	In order to savegard your progress, you need to save your notes manually by clicking on the icon at the top right corner of the screen. You can also enable automatic saving on this site, which means that
+			      	every note is saved automatically without requiring your consent. To enable automatic saving, please look for it in the options found by clicking on the gear icon at the left of the screen.
+			      </span></div>
+			    </li>
+			    <li>
+			      <div class="collapsible-header"><i class="material-icons">share</i>Sharing</div>
+			      <div class="collapsible-body"><span>
+			      	You can choose to share your notes either with a sharable link or by supplying us with the email address of the recipient.
+			      </span></div>
+			    </li>
+			    <!--<li>-->
+			      <!--<div class="collapsible-header"><i class="material-icons">search</i>Search</div>-->
+			      <!--<div class="collapsible-body"><span>-->
+			      	<!--Using this search option will enable you to look up all content you've added on the website such as:-->
+			      	<!--<ul>-->
+			      		<!--<li>Notes (by content)</li>-->
+			      		<!--<li>Notes (by title)</li>-->
+			      		<!--<li>Course (by title)</li>-->
+			      		<!--<li>etc.</li>-->
+			      	<!--</ul>-->
+			      <!--</span></div>-->
+			    <!--</li>-->
+			    <li>
+			      <div class="collapsible-header"><i class="material-icons">settings</i>Settings and Your account</div>
+			      <div class="collapsible-body"><span>
+			      	Want to personalize your account or want to set default behaviours for the site? Head there
+			      	by respectively clicking your image icon and the gear on the left side!
+			      </span></div>
+			    </li>
+			  </ul>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">DISMISS</a>
+		</div>
+	</div>
+	<div id="modal2" class="modal modal-fixed-footer">
+		<div class="modal-content">
+			<div class="center">
+				<h4>Bob Benoît</h4>
+			</div>
+			<div class="container-fluid">
+				<div class="row">
+				    <div class="col s3">
+				    	<img class="responsive-img circle" src="/images/avatar.png">
+				    </div>
+				    <div class="col s9">
+					    <div class="row">
+						    <div class="col s12 m12">
+							    <h6 id="profile-settings-explanation">Change your account information here</h6>
+						    </div>
+					    </div>
+				    	<div class="row thin-row">
+                            <div class="input-field col s12 m6">
+                                <i class="material-icons prefix">account_circle</i>
+                                <input id="username" type="text" class="validate" value="{{{username}}}">
+                                <label data-error="Please enter a username." for="username">Your username</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <i class="material-icons prefix">face</i>
+                                <input id="name" type="text" class="validate" value="{{{name}}}">
+                                <label data-error="Please enter a name" for="name">Your name</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <i class="material-icons prefix">vpn_key</i>
+                                <input id="password" type="password" class="validate">
+                                <label data-error="This password is too short." for="password">Enter a new password</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="cpassword" type="password" class="validate">
+                                <label data-error="This password doesn't match the original password." for="cpassword">Confirm your new password</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 m12">
+                                <i class="material-icons prefix">email</i>
+                                <input id="email" type="email" class="validate" value="{{{email}}}">
+                                <label data-error="Your email is not valid." for="email">Your email address</label>
+                            </div>
+                        </div>
+					    <div class="row">
+						    <div class="file-field input-field col s12 m12">
+							    <div class="btn">
+								    <span>Change profile picture</span>
+								    <input type="file">
+							    </div>
+							    <div class="file-path-wrapper">
+								    <input class="file-path validate" type="text">
+							    </div>
+						    </div>
+					    </div>
+				    </div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+			<a href="#!" class="modal-action modal-close waves-effect green lighten-1 btn-flat">SAVE</a>
+		</div>
+	</div>
+	<div id="modal3" class="modal modal-fixed-footer">
+		<div class="modal-content">
+			<div class="center">
+				<h4>Settings</h4>
+			</div>
+			<div class="container-fluid">
+				<div class="center">
+					<div class="message">
+						<p>Edit here the application's default behaviour.</p>
+					</div>
+				</div>
+				<h5>General</h5>
+				<p>Do you want all notes to be saved on their own?</p>
+				<div class="center">
+					<div class="row">
+						<input type="checkbox" class="filled-in" checked="checked" name="save-auto" id="save-auto">
+						<label for="save-auto">Save notes automatically</label>
+					</div>
+				</div>
+
+				<p>Do you want to be logged out after a certain time?</p>
+				<div class="center">
+					<div class="row">
+						<div >
+							<input type="checkbox" name="logout-after" class="filled-in" id="logout-after" checked="checked">
+							<label for="logout-after">I want to be logged out after...</label>
+						</div>
+						<div class="center">
+							<form>
+								<input type="radio" id="5-mins" data="5" name="time"><label for="5-mins">5 mins</label>
+								<input type="radio" id="10-mins" data="10" name="time"><label for="10-mins">10 mins</label>
+								<input type="radio" id="30-mins" data="30" name="time"><label for="30-mins">30 mins</label>
+								<input type="radio" id="1-hour" data="60" name="time" checked><label for="1-hour">1h</label>
+							</form>
+						</div>
+					</div>
+				</div>
+
+				<!--<p>Do you have a language preference?</p>-->
+				<!--<div class="container">-->
+					<!--<div class="center">-->
+						<!--<div class="row">-->
+							<!--<div class="input-field col s12">-->
+							    <!--<select id="language-select">-->
+							      <!--<option value="" disabled selected>Choose your language (Default: English).</option>-->
+							      <!--<option data='Vous avez sélectionné "Français".' value="1">Français</option>-->
+							      <!--<option data='You have selected "English".' value="2">English</option>-->
+							    <!--</select>-->
+							    <!--<label>Parlez-vous français ? Do you speak English?</label>-->
+							  <!--</div>-->
+						<!--</div>-->
+					<!--</div>-->
+				<!--</div>-->
+
+				<h5>Downloads</h5>
+				<div class="row">
+					<p>Default download format:</p>
+					<div class="container">
+						<div class="center">
+							<div class="row">
+								<div download-format="pdf" class="chip">PDF</div>
+								<div download-format="text" class="chip">Plain text</div>
+								<div download-format="html" class="chip">HTML file</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Dismiss</a>
+		</div>
+	</div>
+	<div id="create-course-modal" class="modal modal-fixed-footer small-modal">
+		<div class="modal-content">
+			<h4 class="modal-header">Create a new course</h4>
+			<div class="container-fluid">
+				<div class="row thin-row">
+					<div class="col s12">
+						Course code for new course (*) :
+						<div class="input-field inline">
+							<input id="new-course-code" required type="text" class="validate" placeholder="ABC1234">
+							<label data-error="Please enter a non empty value" for="new-course-code"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						Course name for new course (*) :
+						<div class="input-field inline">
+							<input id="new-course-name" required type="text" class="validate">
+							<label data-error="Please enter a non empty value" for="new-course-name"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						Professor's name :
+						<div class="input-field inline">
+							<input id="new-course-professor" type="text">
+							<label for="new-course-professor"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						Start date :
+						<div class="input-field inline">
+							<input id="new-course-start-date" placeholder="yyyy-mm-dd" type="date" class="validate">
+							<label data-error="Please enter a valid date" for="new-course-start-date"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						End date :
+						<div class="input-field inline">
+							<input id="new-course-end-date" placeholder="yyyy-mm-dd" type="date" class="validate">
+							<label data-error="Please enter a valid date" for="new-course-end-date"></label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a onclick="eraseNewCourseFields()" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+			<a onclick="createNewCourse();" class="modal-action waves-effect green lighten-1 btn-flat">Create new course</a>
+		</div>
+	</div>
+	<div id="edit-course-modal" class="modal modal-fixed-footer small-modal">
+		<div class="modal-content">
+			<h4 class="modal-header">Edit an existing course</h4>
+			<div class="container-fluid">
+				<div class="row thin-row">
+					<div class="col s12">
+						Updated course code (*) :
+						<div class="input-field inline">
+							<input id="edit-course-code" required placeholder="ABC1234" type="text" class="validate">
+							<label data-error="Please enter a non empty value" for="edit-course-code"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						Updated course name (*) :
+						<div class="input-field inline">
+							<input id="edit-course-name" required type="text" class="validate">
+							<label data-error="Please enter a non empty value" for="edit-course-name"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						Professor's name :
+						<div class="input-field inline">
+							<input id="edit-course-professor" type="text">
+							<label for="edit-course-professor"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						Start date :
+						<div class="input-field inline">
+							<input id="edit-course-start-date" placeholder="yyyy-mm-dd" type="date" class="validate">
+							<label data-error="Please enter a valid date" for="edit-course-start-date"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						End date :
+						<div class="input-field inline">
+							<input id="edit-course-end-date" placeholder="yyyy-mm-dd" type="date" class="validate">
+							<label data-error="Please enter a valid date" for="edit-course-end-date"></label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+			<a onclick="editSelectedCourse();" class="modal-action modal-close waves-effect green lighten-1 btn-flat">Edit selected course</a>
+		</div>
+	</div>
+	<div id="create-note-modal" class="modal modal-fixed-footer small-modal">
+		<div class="modal-content">
+			<h4 class="modal-header">Create a new note</h4>
+			<div class="container-fluid">
+				<div class="row thin-row">
+					<div class="col s12">
+						Note name (*) :
+						<div class="input-field inline">
+							<input id="new-note-name" type="text" class="validate">
+							<label data-error="Please enter a name for your note" for="new-note-name"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						Note subject (*) :
+						<div class="input-field inline">
+							<input id="new-note-subject" type="text" class="validate">
+							<label data-error="Please enter a small description of what the note is about" for="new-note-subject"></label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a onclick="eraseNewNoteFields();" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+			<a onclick="createNewNote();" href="#!" class="modal-action waves-effect green lighten-1 btn-flat">Create new note</a>
+		</div>
+	</div>
+	<div id="edit-note-modal" class="modal modal-fixed-footer small-modal">
+		<div class="modal-content">
+			<h4 class="modal-header">Edit an existing note</h4>
+			<div class="container-fluid">
+				<div class="row thin-row">
+					<div class="col s12">
+						Note name (*) :
+						<div class="input-field inline">
+							<input id="edit-note-name" type="text" class="validate">
+							<label data-error="Please enter a non empty value" for="edit-note-name"></label>
+						</div>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						Note subject (*) :
+						<div class="input-field inline">
+							<input id="edit-note-subject" type="text" class="validate">
+							<label data-error="Please enter a small description of what the note is about" for="edit-note-subject"></label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+			<a onclick="editSelectedNote();" href="#!" class="modal-action modal-close waves-effect green lighten-1 btn-flat">Edit selected note</a>
+		</div>
+	</div>
+	<div id="share-course-modal" class="modal medium-modal">
+		<div class="modal-content">
+			<h4 class="modal-header">Share all notes from course</h4>
+			<p>
+				You can either send your friend a link to download your course notes manually or you can write down his emails so we can send him the notes in a downloadable format.
+			</p>
+			<div class="container-fluid">
+				<div class="row share-input">
+					<div class="input-field col s12">
+						<input readonly value="http://forevernote.com/share/185736248573" id="link2" type="text">
+						<label class="active" for="link2">Link (share manually) :</label>
+					</div>
+				</div>
+				<div class="row thin-row">
+					<div class="col s12">
+						<span>or</span>
+					</div>
+				</div>
+				<div class="row share-input">
+					<div class="input-field col s12">
+						<input placeholder="recipient@gmail.com" id="share-email-2" type="email" required class="validate">
+						<label data-error="Please enter a valid email" class="active" for="share-email-2">Share with (enter email of recipient) :</label>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">DISMISS</a>
+					<a onclick="shareNoteIfSuccessfulTwo();" class="modal-action share-button waves-effect waves-light btn"><i class="material-icons right">share</i>Send link to recipient</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="delete-course-modal" class="modal modal-fixed-footer small-modal dialog-modal">
+		<div class="modal-content">
+			<h4 class="modal-header">Course deletion confirmation</h4>
+			<p>
+				Are you sure you wish to delete the course?<br>You will not be able to recover it later.
+			</p>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+			<a onclick="deleteCourse()" href="#!" class="modal-action modal-close waves-effect red lighten-1 btn-flat">Delete course</a>
+		</div>
+	</div>
+	<div id="delete-note-modal" class="modal modal-fixed-footer small-modal dialog-modal">
+		<div class="modal-content">
+			<h4 class="modal-header">Note deletion confirmation</h4>
+			<p>
+				Are you sure you wish to delete the note?<br>You will not be able to recover it later.
+			</p>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+			<a onclick="deleteNote();" class="modal-action modal-close waves-effect red lighten-1 btn-flat">Delete note</a>
+		</div>
+	</div>
+	<div id="logout-modal" class="modal modal-fixed-footer small-modal dialog-modal">
+		<div class="modal-content">
+			<h4 class="modal-header">Logout confirmation</h4>
+			<p>
+				Are you sure you wish to logout? All unsaved progress will be lost
+			</p>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+			<a onclick="window.location='/'" class="modal-action modal-close waves-effect red lighten-1 btn-flat">Log me out</a>
+		</div>
+	</div>
+</div>
+<main id="main">
+	<ul id="course-side-nav" class="side-nav fixed collection with-header scroll-list">
+		<li class="collection-header">
+			<h6 id="course-header">Courses
+			</h6>
+			<i data-target="create-course-modal" class="fa fa-plus secondary-content header-icon" aria-hidden="true"></i>
+		</li>
+		<!--<a onclick="setCourseActive(this)" id="networkingClass" class="collection-item avatar list-item">-->
+			<!--<span class="title course-code">CEG 3585</span>-->
+			<!--<p class="course-title">-->
+				<!--Networking-->
+			<!--</p>-->
+			<!--<i onclick="prepareCourseDeletion('networkingClass')" class="fa fa-ellipsis-v secondary-content collection-icon" data-jq-dropdown="#course-dropdown" aria-hidden="true"></i>-->
+		<!--</a>-->
+		<!--<a onclick="setCourseActive(this)" id="interfaceClass" class="collection-item avatar list-item">-->
+			<!--<span class="title course-code">SEG 3525</span>-->
+			<!--<p class="course-title">-->
+				<!--Interface design-->
+			<!--</p>-->
+			<!--<i onclick="prepareCourseDeletion('interfaceClass')" class="fa fa-ellipsis-v secondary-content collection-icon" data-jq-dropdown="#course-dropdown" aria-hidden="true"></i>-->
+		<!--</a>-->
+	</ul>
+	<ul id="notes-side-nav" class="side-nav fixed collection with-header scroll-list" style="display: none;">
+	</ul>
+	<div id="editor" class="editor" style="display: none;">
+		<div class="note-title">
+			<h4 id="note-title"></h4>
+			<div id="fullscreen-icon" title="Toggle fullscreen" class="top-icon fullscreen" data-activates="nav-help">
+				<i id="material-fullscreen-icon" class="header-icon material-icons">fullscreen</i>
+			</div>
+			<div id="file_download-icon" title="Download this note" class="top-icon file-download" data-activates="nav-help">
+				<i onclick="Materialize.toast('Starting download of note as pdf...', 4000, 'success-toast');" id="material-file_download-icon" class="header-icon material-icons">file_download</i>
+			</div>
+			<div id="sharing-icon" title="Share..." class="top-icon file-download" data-activates="nav-help">
+				<i data-jq-dropdown="#share-dropdown" id="material-sharing-icon" class="header-icon material-icons">share</i>
+			</div>
+			<div id="save-icon" title="Save this note" class="top-icon file-download" data-activates="nav-help">
+				<i onclick="saveNoteContent()" id="material-save-icon" class="header-icon material-icons">save</i>
+			</div>
+		</div>
+		<div id="editor-container"></div>
+	</div>
+</main>
+<div style="display: none;" id="course-dropdown" class="jq-dropdown jq-dropdown-tip">
+	<ul class="jq-dropdown-menu">
+		<li class="dropdown-head">Course options</li>
+		<li class="jq-dropdown-divider"></li>
+		<li><a onclick="Materialize.toast('Starting download of course notes as zip folder of pdf files...', 4000, 'success-toast');" href="#1">Download all notes (default format) <i class="material-icons dropdown-icon">file_download</i></a></li>
+		<li><a href="#share-course-modal">Share all notes <i class="material-icons dropdown-icon">share</i></a></li>
+		<li><a href="#delete-course-modal">Delete course <i class="material-icons dropdown-icon">delete</i></a></li>
+	</ul>
+</div>
+
+<div style="display: none;" id="note-dropdown" class="jq-dropdown jq-dropdown-tip">
+	<ul class="jq-dropdown-menu">
+		<li class="dropdown-head">Note options</li>
+		<li class="jq-dropdown-divider"></li>
+		<li><a href="#edit-note-modal">Edit note<i class="material-icons dropdown-icon">edit</i></a></li>
+		<li><a href="#delete-note-modal">Delete note<i class="material-icons dropdown-icon">delete</i></a></li>
+	</ul>
+</div>
+
+<div style="display: none;" id="share-dropdown" class="jq-dropdown jq-dropdown-tip jq-dropdown-anchor-right">
+	<div class="jq-dropdown-panel">
+		<div style="border-bottom-style: ridge; border-bottom-width: 1px;" class="dropdown-head">Share your note!</div>
+		<div class="share-panel-content" style="width: 330px">
+			<div class="row share-input">
+				<div class="input-field col s12">
+					<input readonly value="http://forevernote.com/share/185736248573" id="link" type="text">
+					<label class="active" for="link">Link (share manually) :</label>
+				</div>
+			</div>
+			<div class="row thin-row">
+				<div class="col s12">
+					<span>or</span>
+				</div>
+			</div>
+			<div class="row share-input">
+				<form id="share-form">
+					<div class="input-field col s12">
+						<input required placeholder="recipient@gmail.com" id="share-email" type="email" class="validate">
+						<label data-error="Please enter a valid email" class="active" for="share-email">Share with (enter email of recipient) :</label>
+						<a onclick="shareNoteIfSuccessful();" class="share-button waves-effect waves-light btn"><i class="material-icons right">share</i>Send link to recipient</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="/js/editor.js"></script>
+<script type="text/javascript" src="/js/editorSideNavHandler.js"></script>
+<link type="text/css" rel="stylesheet" href="/css/jquery.dropdown.css" />
+<script type="text/javascript" src="/js/jquery.dropdown.js"></script>
