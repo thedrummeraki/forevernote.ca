@@ -117,11 +117,11 @@
             }
             if (key && (key == '115' || key == '83' ) && (e.ctrlKey || e.metaKey) && !(e.altKey)) {
                 e.preventDefault();
-                if (current_note) {
+                //if (current_note) {
                   saveNote();
-                } else {
-                  alert("Please create or open a note before attempting to save one.");
-                }
+                //} else {
+                  //alert("Please create or open a note before attempting to save one.");
+                //}
                 return false;
             }
             return true;
