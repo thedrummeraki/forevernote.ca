@@ -88,7 +88,8 @@ class ApplicationController < ActionController::Base
   def save_note
     contents = params[:content]
     id = params[:note_id]
-    render json: {success: current_user.save_note(contents, id)}
+    new_id = current_user.save_note(contents, id, true)
+    render json: {success: !new_id.nil?, new_id: new_id}
   end
 
   def get_note

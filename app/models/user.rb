@@ -14,7 +14,7 @@ class User < ApplicationRecord
         self.name || self.username
     end
 
-    def save_note(note, id)
+    def save_note(note, id, get_id=false)
         p "gen id"
         id = id || OpenSSL::Digest::SHA256.new(Time.now.to_s).to_s
         i = -1
@@ -39,7 +39,13 @@ class User < ApplicationRecord
             end
         end
         p "done"
-        self.save
+        res = self.save
+        if get_id 
+            return nil unless res
+            return id
+        else
+            res
+        end
     end
 
     def get_note(id)

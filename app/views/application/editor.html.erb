@@ -103,6 +103,7 @@
             method: 'post',
             success: function(e) {
               if (e.success) {
+                current_note = e.new_id;
                 Materialize.toast("Note successfully saved!", 4000, "success-toast");
                 getNotes();
               }
