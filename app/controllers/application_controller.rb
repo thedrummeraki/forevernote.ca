@@ -106,4 +106,27 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def get_notes
+    render json: {notes: current_user.get_notes}
+  end
+
+  def download_text
+    id = params[:note_id]
+    if id
+      note = current_user.get_note(id)
+      if note
+        res = {success: true}
+        note_text = note[:note].gsub("<br>", "\n")
+        note_text = note_text.gsub("<br/>", "\n")
+        note_text = Nokogiri::HTML(note_text).text
+        send_data note_text, filename: "forevernote-#{note[:id]}.txt"
+      else
+        res = {success: false, url: nil}
+        render json: res
+      end
+    else
+      render json: {success: false, message: "No note was specified."}
+    end
+  end
+
 end

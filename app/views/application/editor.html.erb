@@ -4,7 +4,8 @@
       <div class="nav-wrapper">
         <a href="#!" class="brand-logo">Logo</a>
         <ul class="right hide-on-med-and-down">
-          <li><a href="#"><i class="material-icons">edit</i></a></li>
+          <li note-option note-listener class="hide"><a href="#"><i class="material-icons">edit</i></a></li>
+          <li note-option="download" note-listener class="hide"><a href="#"><i class="material-icons">file_download</i></a></li>
           <li><a href="/logout"><i class="material-icons">exit_to_app</i></a></li>
         </ul>
       </div>
@@ -35,21 +36,12 @@
                 <i class="material-icons right">search</i>
             </div>
         </li>
-        <% count = 1 %>
-        <li class="notes">
-            <% current_user.get_notes.each do |note| %>
-              <% text = Nokogiri::HTML(note[:note]).text %>
-              <% if text.to_s.size == 0 %>
-                <% text = "<Empty>" %>
-              <% end %>
-              <a note-container="<%= note[:id] %>" href="#" style="height: 75px" class="waves-effect waves-light">
-                <div class="row">
-                  <b>Note #<%= count %></b>
-                  <p style="margin: 0; margin-top: -20px; padding: 0;"><%= text %></p>
-                </div>
-              </a>
-              <% count += 1 %>
-            <% end %>
+        <li id="notes-list-side" class="notes">
+          <a href="#" class="note-container waves-effect waves-light">
+            <div class="row">
+              <p class="note-content"></p>
+            </div>
+          </a>
         </li>
     </ul>
 </header>
@@ -85,7 +77,55 @@
 
 <script type="text/javascript">
     var current_note = null;
+    function extractContent(s) {
+      var span= document.createElement('span');
+      span.innerHTML= s;
+      return span.textContent || span.innerText;
+    };
+
     $(document).ready(function() {
+        function downloadNote() {
+          if (current_note) {
+            window.open('/note/download/as_text?note_id=' + current_note);
+          } else {
+            alert("Please create or open a note before attempting to download one.");
+          }
+        }
+        function saveNote() {
+          var new_content = $('#editor-container > .ql-editor').html();
+          console.log("Saving note... (" + new_content.length + " bytes)");
+          var url = '/save/note?content=' + new_content;
+          if (current_note) {
+            url = url.concat('&note_id=' + current_note);
+          }
+          $.ajax({
+            url: url,
+            method: 'post',
+            success: function(e) {
+              if (e.success) {
+                Materialize.toast("Note successfully saved!", 4000, "success-toast");
+                getNotes();
+              }
+            }
+          });
+        }
+        $(document).keydown(function(e) {
+            var key = undefined;
+            var possible = [ e.key, e.keyIdentifier, e.keyCode, e.which ];
+            while (key === undefined && possible.length > 0) {
+                key = possible.pop();
+            }
+            if (key && (key == '115' || key == '83' ) && (e.ctrlKey || e.metaKey) && !(e.altKey)) {
+                e.preventDefault();
+                if (current_note) {
+                  saveNote();
+                } else {
+                  alert("Please create or open a note before attempting to save one.");
+                }
+                return false;
+            }
+            return true;
+        }); 
         function hideInitMessage(listeners) {
           [].forEach.call(listeners, function(l) {
             if (l.getAttribute("note-listener") == "init-message") {
@@ -95,22 +135,116 @@
         }
 
         function showNoteOptions(listeners) {
+          listeners = listeners || document.querySelectorAll("[note-listener]");
           [].forEach.call(listeners, function(l) {
             if (l.hasAttribute("note-listener") && l.hasAttribute("note-option")) {
               l.classList.remove('hide');
+              if (l.getAttribute("note-option") == "download") {
+                l.onclick = function(e) {
+                  downloadNote();
+                }
+              }
             }
           });
         }
 
+        function showNote(e) {
+            e.preventDefault();
+            var id = this.getAttribute("note-container");
+            $.ajax({
+              url: '/get/note?note_id=' + id,
+              method: 'get',
+              success: function(res) {
+                if (res.success) {
+                  editor_cont.classList.remove("hide");
+                  hideInitMessage(note_listeners);
+                  note_mgmt_icon.innerHTML = "save";
+                  note_mgmt_btn.setAttribute("state", "creating");
+                  $('#editor-container > .ql-editor').html(res.contents);
+                  current_note = id;
+                  showNoteOptions();
+                } else {
+                  console.error("This note was probably deleted off the server.");
+                }
+              }
+            });
+          }
+
+        function buildNote(note) {
+          id = note.id;
+          note = extractContent(note.note);
+          if (note.length > 30) {
+            note = note.substring(0, 30) + "<i>[...]</i>";
+          } else if (note.trim().length == 0) {
+            note = "<i>Empty</i>";
+          }
+          return [
+            '<a note-container="' + id + '" href="#" class="note-container waves-effect waves-light">',
+              '<div class="row">',
+                '<b>Title</b>',
+                '<p style="margin: 0; margin-top: -20px; padding: 0;" class="note-content">' + note + '</p>',
+              '</div>',
+            '</a>'
+          ].join("");
+        }
+
+        function getNotes(callback) {
+          var cont = document.getElementById("notes-list-side");
+          $.ajax({
+            url: '/get/notes',
+            method: 'get',
+            success: function(e) {
+              if (e.notes) {
+                var notes = "";
+                [].forEach.call(e.notes, function(note) {
+                  notes += buildNote(note);
+                });
+                cont.innerHTML = notes;
+                if (callback) {
+                  callback(document.querySelectorAll("[note-container]"));
+                }
+              }
+            }
+          });
+        }
+
+        var toolbarOptions = [
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          ['blockquote', 'code-block'],
+
+          [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+          [{ 'direction': 'rtl' }],                         // text direction
+
+          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+          [{ 'font': [] }],
+          [{ 'align': [] }],
+
+          ['clean']                                         // remove formatting button
+        ];
+
         var options = {
           placeholder: 'Start typing your note here...',
+          modules: {
+            toolbar: toolbarOptions
+          },
           theme: 'snow'
         };
         var editor = new Quill('#editor-container', options);
         var editor_cont = document.getElementById("editor");
+        var note_containers = [];
+        getNotes(function(note_containers) {
+          [].forEach.call(note_containers, function(nc) {
+            nc.onclick = showNote;
+          });
+        });
 
         var note_listeners = document.querySelectorAll("[note-listener]");
-        var note_containers = document.querySelectorAll("[note-container]");
 
         var note_mgmt_btn = document.getElementById("note-mgnt-btn");
         var note_mgmt_icon = document.getElementById("note-mgnt-icon");
@@ -123,45 +257,10 @@
                     note_mgmt_btn.setAttribute("state", "creating");
                 }
             } else if (note_mgmt_btn.getAttribute("state") == "creating") {
-              var new_content = $('#editor-container > .ql-editor').html();
-              console.log("Saving note... (" + new_content.length + " bytes)");
-              var url = '/save/note?content=' + new_content;
-              if (current_note) {
-                url = url.concat('&note_id=' + current_note);
-              }
-              $.ajax({
-                url: url,
-                method: 'post',
-                success: function(e) {
-                  if (e.success) {
-                    Materialize.toast("Note successfully saved!", 4000, "success-toast");
-                  }
-                }
-              });
+              saveNote();
             }
         };
 
-        [].forEach.call(note_containers, function(nc) {
-          nc.onclick = function(e) {
-            e.preventDefault();
-            var id = nc.getAttribute("note-container");
-            $.ajax({
-              url: '/get/note?note_id=' + id,
-              method: 'get',
-              success: function(res) {
-                if (res.success) {
-                  editor_cont.classList.remove("hide");
-                  hideInitMessage(note_listeners);
-                  note_mgmt_icon.innerHTML = "save";
-                  note_mgmt_btn.setAttribute("state", "creating");
-                  $('#editor-container > .ql-editor').html(res.contents);
-                  current_note = id;
-                } else {
-                  console.error("This note was probably deleted off the server.");
-                }
-              }
-            });
-          }
-        });
+        
     });
 </script>

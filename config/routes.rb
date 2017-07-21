@@ -9,5 +9,8 @@ Rails.application.routes.draw do
 
   get '/editor' => 'application#editor'
   get '/get/note' => 'application#get_note'
+  get '/get/notes' => 'application#get_notes'
   post '/save/note' => 'application#save_note'
+
+  get '/note/download/as_text' => 'application#download_text'
 end
