@@ -1,0 +1,232 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+li.search .search-wrapper input#search {
+    display: block;
+    font-size: 16px;
+    font-weight: 300;
+    width: 100%;
+    height: 45px;
+    margin: 0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 45px 0 15px;
+    border: 0;
+}
+
+.search {
+    margin-top: 20px;
+}
+
+li.search .search-wrapper i.material-icons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+
+/**
+    Wrapper and vertical-center are used for vertically
+    centering content.
+
+    Usage:
+      <div class="vertical-center">
+        <div class="wrapper">
+          <p>Things to vertically center.</p>
+        </div>
+      </div>
+ */
+.wrapper {
+  position: absolute;
+  display: table;
+  width: 100%;
+}
+.vertical-center {
+   min-height: 90vh;
+   display: flex;
+   align-items: center;
+ }
+
+/* App catch phrase's style */
+.catch-phrase {
+  font-weight: bold;
+  color: #9fa0ff;
+  font-size: 115%;
+}
+
+/* Verification code CSS */
+.verification-act-code input[type="text"] {
+  text-align: center;
+}
+
+/* Status CSS classes */
+.message {
+    font-weight: bold;
+}
+
+.error.message {
+    color: #990000;
+}
+
+.success.message {
+    color: #004d00;
+}
+
+.waiting.message, .loading.message {
+    color: #b3b300;
+}
+
+/* Utils classes */
+.container-fluid {
+  padding: 20px;
+}
+
+.container.message {
+  width: 60%;
+}
+
+.container.cont {
+  margin-top: 30px;
+}
+
+.message.title {
+  margin-top: 10%;
+}
+
+.modal {
+  z-index: 1000;
+}
+
+.forgot h5 {
+  margin-top: 30px;
+}
+
+.step {
+  padding-top: 10px;
+}
+
+.chip {
+    cursor: pointer;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    
+    transition: .3s;
+    -o-transition: .3s;
+    -webkit-transition: .3s;
+    -ms-transition: .3s;
+    -moz-transition: .3s;
+}
+
+.chip:hover {
+    background-color: #CDCDCD;
+}
+
+.chip.active {
+    background-color: #26a69a;
+    color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.editor {
+    /* left: 480px;
+    margin-right: 480px; */
+    position: relative;
+    height: 88vh;
+    margin-top: -15px;
+}
+
+.next-to-side {
+    left: 300px;
+    margin-right: 300px;
+}
+
+.editor .top-icon {
+    float: right;
+    margin: -55px 30px 40px 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+     user-select: none;
+}
+
+.top-icon .header-icon {
+    position: relative;
+    padding: 0;
+}
+
+.editor .top-icon:hover {
+    cursor: pointer;
+}
+
+.editor .fullscreen {
+}
+
+.editor .file-download {
+}
+
+.editor .sharing {
+}
+
+.top-icon .material-icons {
+    font-size: 2.5em;
+}
+
+.editor .input-field {
+    width: 60%;
+}
+
+.editor .note-title {
+    padding-left: 20px;
+    /*Below breaks the note-taking icons, commented out in case below line was important*/
+    /*width: 50%;*/
+    font-weight: bold;
+}
+
+.editor .note-title .row {
+    margin-bottom: 0;
+}
+
+.editor input[type="text"] {
+    height: 3em;
+    font-size: 150%;
+    border-bottom: 1px solid #fff;
+    margin: 0;
+}

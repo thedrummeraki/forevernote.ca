@@ -1,0 +1,167 @@
+
+<header>
+    <nav>
+      <div class="nav-wrapper">
+        <a href="#!" class="brand-logo">Logo</a>
+        <ul class="right hide-on-med-and-down">
+          <li><a href="#"><i class="material-icons">edit</i></a></li>
+          <li><a href="/logout"><i class="material-icons">exit_to_app</i></a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container">
+        <a href="#" data-activates="nav-mobile" class="button-collapse top-nav waves-effect waves-light circle hide-on-large-only">
+            <i class="material-icons">menu</i>
+        </a>
+    </div>
+    <ul id="nav-mobile" class="side-nav fixed">
+        <div class="container">
+            <div class="center">
+                <div style="margin-top: 20px;" class="row">
+                  <div class="col col s4 m4 l4">
+                    <a title="Edit your account" href="#modal_user_edit">
+                      <img src="https://www.gravatar.com/avatar/<%= current_user.get_email_hash %>" class="circle responsive-img valign profile-image">
+                    </a>
+                  </div>
+                  <div class="col col s8 m8 l8">
+                    <h5>Your notes</h5>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <li class="search">
+            <div class="search-wrapper card">
+                <input type="text" id="search" autocomplete="off" placeholder="Search through notes...">
+                <i class="material-icons right">search</i>
+            </div>
+        </li>
+        <% count = 1 %>
+        <li class="notes">
+            <% current_user.get_notes.each do |note| %>
+              <% text = Nokogiri::HTML(note[:note]).text %>
+              <% if text.to_s.size == 0 %>
+                <% text = "<Empty>" %>
+              <% end %>
+              <a note-container="<%= note[:id] %>" href="#" style="height: 75px" class="waves-effect waves-light">
+                <div class="row">
+                  <b>Note #<%= count %></b>
+                  <p style="margin: 0; margin-top: -20px; padding: 0;"><%= text %></p>
+                </div>
+              </a>
+              <% count += 1 %>
+            <% end %>
+        </li>
+    </ul>
+</header>
+
+<main>
+    <div id="modals">
+      <%= render 'shared/modals' %>
+    </div>
+    <div class="fixed-action-btn">
+        <a title="Create a new note" state="new" id="note-mgnt-btn" class="btn-floating btn-large red">
+          <i class="large material-icons" id="note-mgnt-icon">mode_edit</i>
+        </a>
+        <ul class="hide">
+          <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+        </ul>
+    </div>
+    <div note-listener="init-message" class="vertical-center next-to-side">
+      <div class="wrapper">
+        <div class="center">
+          <div class="nothing">
+            - Please select a note on the side or click on the button below to create a new note -
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="editor" class="editor next-to-side hide">
+        <div class="note-title">
+            <h4 id="note-title"></h4>
+        </div>
+        <div id="editor-container"></div>
+    </div>
+</main>
+
+<script type="text/javascript">
+    var current_note = null;
+    $(document).ready(function() {
+        function hideInitMessage(listeners) {
+          [].forEach.call(listeners, function(l) {
+            if (l.getAttribute("note-listener") == "init-message") {
+              l.classList.add('hide');
+            }
+          });
+        }
+
+        function showNoteOptions(listeners) {
+          [].forEach.call(listeners, function(l) {
+            if (l.hasAttribute("note-listener") && l.hasAttribute("note-option")) {
+              l.classList.remove('hide');
+            }
+          });
+        }
+
+        var options = {
+          placeholder: 'Start typing your note here...',
+          theme: 'snow'
+        };
+        var editor = new Quill('#editor-container', options);
+        var editor_cont = document.getElementById("editor");
+
+        var note_listeners = document.querySelectorAll("[note-listener]");
+        var note_containers = document.querySelectorAll("[note-container]");
+
+        var note_mgmt_btn = document.getElementById("note-mgnt-btn");
+        var note_mgmt_icon = document.getElementById("note-mgnt-icon");
+        note_mgmt_btn.onclick = function(e) {
+            if (note_mgmt_btn.getAttribute("state") == "new") {
+                if (editor_cont.classList.contains("hide")) {
+                    editor_cont.classList.remove("hide");
+                    hideInitMessage(note_listeners);
+                    note_mgmt_icon.innerHTML = "save";
+                    note_mgmt_btn.setAttribute("state", "creating");
+                }
+            } else if (note_mgmt_btn.getAttribute("state") == "creating") {
+              var new_content = $('#editor-container > .ql-editor').html();
+              console.log("Saving note... (" + new_content.length + " bytes)");
+              var url = '/save/note?content=' + new_content;
+              if (current_note) {
+                url = url.concat('&note_id=' + current_note);
+              }
+              $.ajax({
+                url: url,
+                method: 'post',
+                success: function(e) {
+                  if (e.success) {
+                    Materialize.toast("Note successfully saved!", 4000, "success-toast");
+                  }
+                }
+              });
+            }
+        };
+
+        [].forEach.call(note_containers, function(nc) {
+          nc.onclick = function(e) {
+            e.preventDefault();
+            var id = nc.getAttribute("note-container");
+            $.ajax({
+              url: '/get/note?note_id=' + id,
+              method: 'get',
+              success: function(res) {
+                if (res.success) {
+                  editor_cont.classList.remove("hide");
+                  hideInitMessage(note_listeners);
+                  note_mgmt_icon.innerHTML = "save";
+                  note_mgmt_btn.setAttribute("state", "creating");
+                  $('#editor-container > .ql-editor').html(res.contents);
+                  current_note = id;
+                } else {
+                  console.error("This note was probably deleted off the server.");
+                }
+              }
+            });
+          }
+        });
+    });
+</script>

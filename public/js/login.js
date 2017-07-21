@@ -9,6 +9,7 @@ function login() {
     submit_btn.classList.add("hide");
     loader.classList.remove("hide");
 
+    var label = document.querySelector('[for="username"]');
     var one = username.value;
     var two = password.value;
     $.ajax({
@@ -19,13 +20,18 @@ function login() {
             submit_btn.classList.remove("hide");
 
             if (!e.success) {
+                label.setAttribute("data-error", e.message);
                 username.classList.add("invalid");
                 password.value = "";
                 password.classList.remove("valid");
-                username.focus();
+                if (e.password) {
+                    password.focus();
+                } else {
+                    username.focus();
+                }
             } else {
                 submit_btn.classList.add("disabled");
-                window.location.replace("/editor?username=" + username.value);
+                window.location.href = "/editor";
             }
         }
     });

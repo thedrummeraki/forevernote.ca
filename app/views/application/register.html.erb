@@ -1,0 +1,75 @@
+<div>
+    <div class="container-fluid">
+        <!--<a class="btn waves-effect waves-light deep-orange lighten-2" href="/">How does it work?</a>-->
+        <a class="btn waves-effect waves-light right" href="/">Login</a>
+    </div>
+    <div class="vertical-center">
+        <div class="wrapper">
+            <div class="center">
+                <h4>ForeverNote</h4>
+                <p class="catch-phrase">
+                    Making note-taking for students painless.
+                </p>
+
+                <div class="container">
+                    <div class="container">
+                        <div class="row">
+                            <form id="register-form" onsubmit="return register();">
+                                <div class="row">
+                                    <div class="input-field col s12 m6">
+                                        <i class="material-icons prefix">account_circle</i>
+                                        <input id="username" type="text" class="validate">
+                                        <label data-error="Please enter a username." for="username">Your new username (*)</label>
+                                    </div>
+                                    <div class="input-field col s12 m6">
+                                        <i class="material-icons prefix">face</i>
+                                        <input id="name" type="text" class="validate">
+                                        <label data-error="Please enter a name." for="name">Your name</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12 m6">
+                                        <i class="material-icons prefix">vpn_key</i>
+                                        <input id="password" type="password" class="validate">
+                                        <label data-error="This password is too short." for="password">Choose a password (*)</label>
+                                    </div>
+                                    <div class="input-field col s12 m6">
+                                        <input id="cpassword" type="password" class="validate">
+                                        <label data-error="This password doesn't match the original password." for="cpassword">Confirm your password (*)</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12 m12">
+                                        <i class="material-icons prefix">email</i>
+                                        <input id="email" type="email" class="validate">
+                                        <label data-error="Your email is not valid." for="email">Your email address (*)</label>
+                                    </div>
+                                </div>
+                                <div class="row hide">
+                                    <div class="file-field input-field col s12 m12">
+                                        <div class="btn">
+                                            <span>Profile picture</span>
+                                            <input type="file">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input placeholder="Attach a picture to use as your profile picture" class="file-path validate" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="">
+                                        <button style="margin-top: 10px;" class="btn" value="login" id="">
+                                            Register
+                                            <i class="material-icons prefix right">send</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/js/register.js"></script>
+</div>
