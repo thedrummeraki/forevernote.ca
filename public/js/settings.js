@@ -6,7 +6,8 @@ var Settings = (function() {
             enabled: true,
             time: 60,
         },
-        "download-format": "pdf"
+        "download-format": "pdf",
+        "theme-color": "default"
     };
     var init = false;
     var settings = {};
@@ -29,6 +30,10 @@ var Settings = (function() {
         return value;
     }
 
+    var checkBool = function(key) {
+        return getSetting(key, false) == true
+    }
+
     var getPlural = function(key) {
         if (key == "pdf") {
             return "PDFs";
@@ -37,6 +42,26 @@ var Settings = (function() {
         } else if (key == "text") {
             return "text files";
         }
+    }
+
+    var setBackground = function(color) {
+        console.log("settings background color: " + color)
+        var nav_wrapper = document.getElementById("nav-wrapper");
+        if (nav_wrapper) {
+            var old_color = nav_wrapper.getAttribute('color');
+            nav_wrapper.setAttribute('color', color);
+            _updateBackground(nav_wrapper, old_color);
+        } else {
+            console.error("No nav-wrapper found.")
+        }
+    }
+
+    var _updateBackground = function(nav_wrapper, old_color) {
+        var current_color = nav_wrapper.getAttribute('color');
+        if (old_color !== undefined) {
+            nav_wrapper.classList.remove(old_color);
+        }
+        nav_wrapper.classList.add(current_color);
     }
 
     var _save = function() {
@@ -59,6 +84,8 @@ var Settings = (function() {
     return {
         save: setSetting,
         fetch: getSetting,
-        plural: getPlural
+        plural: getPlural,
+        background: setBackground,
+        is: checkBool,
     }
 })();

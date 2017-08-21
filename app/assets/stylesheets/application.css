@@ -25,8 +25,84 @@ a {
 .nav-wrapper {
   background: #64b5f6;
 }
+.nav-wrapper.loading {
+  background: #95d0ff;
+}
+.nav-wrapper.red {
+  background: #e57373;
+}
+.nav-wrapper.red.loading {
+  background: #ffcdd2 !important;
+}
+.nav-wrapper.pink {
+  background: #f06292;
+}
+.nav-wrapper.pink.loading {
+  background: #f8bbd0 !important;
+}
+.nav-wrapper.purple {
+  background: #ba68c8;
+}
+.nav-wrapper.purple.loading {
+  background: #e1bee7 !important;
+}
+.nav-wrapper.blue {
+  background: #64b5f6 !important;
+}
+.nav-wrapper.blue.loading {
+  background: #95d0ff !important;
+}
+.nav-wrapper.default {
+  background: #64b5f6;
+}
+.nav-wrapper.default.loading {
+  background: #95d0ff !important;
+}
+.nav-wrapper.cyan {
+  background: #4dd0e1;
+}
+.nav-wrapper.cyan.loading {
+  background: #b2ebf2 !important;
+}
+.nav-wrapper.green {
+  background: #81c784;
+}
+.nav-wrapper.green.loading {
+  background: #c8e6c9 !important;
+}
+.nav-wrapper.yellow {
+  background: #ffca28;
+}
+.nav-wrapper.yellow .material-icons {
+  color: black;
+}
+.nav-wrapper.yellow.loading {
+  background: #fff9c4 !important;
+}
+.nav-wrapper.orange {
+  background: #ff9800;
+}
+.nav-wrapper.orange.loading {
+  background: #ffe0b2 !important;
+}
+.nav-wrapper.brown {
+  background: #8d6e63;
+}
+.nav-wrapper.brown.loading {
+  background: #bcaaa4 !important;
+}
+.nav-wrapper.grey {
+  background: #757575;
+}
+.nav-wrapper.grey.loading {
+  background: #bdbdbd !important;
+}
 .side-nav {
   background: #e3f2fd;
+}
+
+.ql-container {
+    font-size: 20px;
 }
 
 li.search .search-wrapper input#search {
@@ -51,6 +127,16 @@ li.search .search-wrapper i.material-icons {
     top: 10px;
     right: 10px;
     cursor: pointer;
+}
+
+.success-toast{
+  background: rgba(59, 180, 71, 0.65);
+}
+.warning-toast, .delete-toast {
+  background: rgba(180, 178, 52, 0.65);
+}
+.error-toast{
+  background: #EF5350;
 }
 
 
@@ -170,7 +256,9 @@ li.search .search-wrapper i.material-icons {
 
 
 
-
+.progress.in-menu {
+  margin-top: -1px;
+}
 
 .editor {
     /* left: 480px;

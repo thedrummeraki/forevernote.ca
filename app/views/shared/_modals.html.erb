@@ -1,4 +1,163 @@
 <div>
+    <div id="settings" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <div class="center">
+                <h4>Settings</h4>
+            </div>
+            <div class="container-fluid">
+                <div class="center">
+                    <div class="message">
+                        <p>Edit here the application's default behaviour.</p>
+                    </div>
+                </div>
+                <h5>General</h5>
+                <p>Do you want all notes to be saved on their own?</p>
+                <div class="center">
+                    <div class="row">
+                        <input settings-switch="save-auto" settings-listener="notes-saving" settings-value="true" type="checkbox" class="filled-in" name="save-auto" id="save-auto">
+                        <label for="save-auto">Save notes automatically (refresh the page for changes to take effect)</label>
+                    </div>
+                </div>
+
+                <p>Which theme color would please you most?</p>
+                <div class="center">
+                  <div class="input-field col s12">
+                    <select settings-listener="theme-color">
+                      <option value="" disabled selected>Choose your option</option>
+                      <option data-color="red">Red</option>
+                      <option data-color="pink">Pink</option>
+                      <option data-color="purple">Purple</option>
+                      <option data-color="blue">Blue (default)</option>
+                      <option data-color="cyan">Cyan</option>
+                      <option data-color="green">Green</option>
+                      <option data-color="brown">Brown</option>
+                      <option data-color="orange">Orange</option>
+                      <option data-color="grey">Grey</option>
+                      <option data-color="yellow">Yellow (not recommended)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <p>Do you want to be logged out after a certain time?</p>
+                <div class="center">
+                    <div class="row">
+                        <div >
+                            <input type="checkbox" name="logout-after" class="filled-in" id="logout-after" checked="checked">
+                            <label for="logout-after">I want to be logged out after...</label>
+                        </div>
+                        <div class="center">
+                            <form>
+                                <input type="radio" id="5-mins" settings-listener="logout-after" settings-value="5" name="time"><label for="5-mins">5 mins</label>
+                                <input type="radio" id="10-mins" settings-listener="logout-after" settings-value="10" name="time"><label for="10-mins">10 mins</label>
+                                <input type="radio" id="30-mins" settings-listener="logout-after" settings-value="30" name="time"><label for="30-mins">30 mins</label>
+                                <input type="radio" id="1-hour" settings-listener="logout-after" settings-value="60" name="time" checked><label for="1-hour">1h</label>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!--<p>Do you have a language preference?</p>-->
+                <!--<div class="container">-->
+                    <!--<div class="center">-->
+                        <!--<div class="row">-->
+                            <!--<div class="input-field col s12">-->
+                                <!--<select id="language-select">-->
+                                  <!--<option value="" disabled selected>Choose your language (Default: English).</option>-->
+                                  <!--<option data='Vous avez sélectionné "Français".' value="1">Français</option>-->
+                                  <!--<option data='You have selected "English".' value="2">English</option>-->
+                                <!--</select>-->
+                                <!--<label>Parlez-vous français ? Do you speak English?</label>-->
+                              <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <h5>Downloads</h5>
+                <div class="row">
+                    <p>Default download format:</p>
+                    <div class="container">
+                        <div class="center">
+                            <div class="row">
+                                <div settings-listener="download-format" settings-value="pdf" class="chip">PDF</div>
+                                <div settings-listener="download-format" settings-value="text" class="chip">Plain text</div>
+                                <div settings-listener="download-format" settings-value="html" class="chip">HTML file</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat">Dismiss</a>
+        </div>
+    </div>
+    <div id="help" class="modal">
+        <div class="modal-content">
+            <h4>Help</h4>
+            <p>Need some help getting around with ForeverNote?</p>
+             <ul class="collapsible" data-collapsible="accordion">
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">add</i>Creating a course</div>
+                  <div class="collapsible-body"><span>
+                    The first thing you must do before creating a note is a course. Select the "+" sign next
+                    to "Courses" on the top left of the window in order to do so.
+                  </span></div>
+                </li>
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">add</i>Creating a note</div>
+                  <div class="collapsible-body"><span>
+                    After creating a course, select the "+" sign next to "Notes" on the top left, next to "Courses". You will be prompted
+                    to enter the note title and the note subject. By doing so, you will be able to create a note. The content of the note may be edited at the right side of the screen.
+                  </span></div>
+                </li>
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">delete_forever</i>Deleting courses and notes</div>
+                  <div class="collapsible-body"><span>
+                    Here is what you should know about deleting content on this site:
+                    <ul>
+                        <li>Delete a note: This will completely delete <u>all</u> contents of the note from the website after confirmation. You can delete a note by clicking the options menu next to the note and then clicking on the trash icon of the sub menu that will appear.</li>
+                        <li>Delete a course: This will completely erase <u>all</u> notes associeted with the course and delete the course, after confirmation. You can delete a course by clicking the options menu next to the course and then clicking on the trash icon of the sub menu that will appear.</li>
+                    </ul>
+                  </span></div>
+                </li>
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">save</i>Saving</div>
+                  <div class="collapsible-body"><span>
+                    In order to savegard your progress, you need to save your notes manually by clicking on the icon at the top right corner of the screen. You can also enable automatic saving on this site, which means that
+                    every note is saved automatically without requiring your consent. To enable automatic saving, please look for it in the options found by clicking on the gear icon at the left of the screen.
+                  </span></div>
+                </li>
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">share</i>Sharing</div>
+                  <div class="collapsible-body"><span>
+                    You can choose to share your notes either with a sharable link or by supplying us with the email address of the recipient.
+                  </span></div>
+                </li>
+                <!--<li>-->
+                  <!--<div class="collapsible-header"><i class="material-icons">search</i>Search</div>-->
+                  <!--<div class="collapsible-body"><span>-->
+                    <!--Using this search option will enable you to look up all content you've added on the website such as:-->
+                    <!--<ul>-->
+                        <!--<li>Notes (by content)</li>-->
+                        <!--<li>Notes (by title)</li>-->
+                        <!--<li>Course (by title)</li>-->
+                        <!--<li>etc.</li>-->
+                    <!--</ul>-->
+                  <!--</span></div>-->
+                <!--</li>-->
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">settings</i>Settings and Your account</div>
+                  <div class="collapsible-body"><span>
+                    Want to personalize your account or want to set default behaviours for the site? Head there
+                    by respectively clicking your image icon and the gear on the left side!
+                  </span></div>
+                </li>
+              </ul>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">DISMISS</a>
+        </div>
+    </div>
     <div id="modal_user_edit" class="modal modal-fixed-footer">
         <div class="modal-content">
             <div class="center">
@@ -18,13 +177,13 @@
                         <div class="row thin-row">
                             <div class="input-field col s12 m6">
                                 <i class="material-icons prefix">account_circle</i>
-                                <input id="username" type="text" class="validate" value="<%= current_user.username %>">
-                                <label data-error="Please enter a username." for="username">Your username</label>
+                                <input id="username" type="text" class="active validate" value="<%= current_user.username %>">
+                                <label data-error="Please enter a username." class="active" for="username">Your username</label>
                             </div>
                             <div class="input-field col s12 m6">
                                 <i class="material-icons prefix">face</i>
-                                <input id="name" type="text" class="validate" value="<%= current_user.name %>">
-                                <label data-error="Please enter a name" for="name">Your name</label>
+                                <input id="name" type="text" class="validate active" value="<%= current_user.name %>">
+                                <label data-error="Please enter a name" class="active" for="name">Your name</label>
                             </div>
                         </div>
                         <div class="row">
@@ -41,8 +200,8 @@
                         <div class="row">
                             <div class="input-field col s12 m12">
                                 <i class="material-icons prefix">email</i>
-                                <input id="email" type="email" class="validate" value="<%= current_user.email_address %>">
-                                <label data-error="Your email is not valid." for="email">Your email address</label>
+                                <input id="email" type="email" class="active validate" value="<%= current_user.email_address %>">
+                                <label data-error="Your email is not valid." class="active" for="email">Your email address</label>
                             </div>
                         </div>
                         <div class="row hide">
@@ -69,6 +228,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        $('select').material_select();
         $('.modal').modal();
     });
 </script>

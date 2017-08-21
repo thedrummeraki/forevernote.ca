@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   get '/get/note' => 'application#get_note'
   get '/get/notes' => 'application#get_notes'
   post '/save/note' => 'application#save_note'
+  patch '/save/note/title' => 'application#save_note_title'
 
   get '/note/download/as_text' => 'application#download_text'
 end

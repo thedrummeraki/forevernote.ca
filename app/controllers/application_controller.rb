@@ -88,8 +88,49 @@ class ApplicationController < ActionController::Base
   def save_note
     contents = params[:content]
     id = params[:note_id]
-    new_id = current_user.save_note(contents, id, true)
-    render json: {success: !new_id.nil?, new_id: new_id}
+    is_chunks = params[:chunks] == "true"
+    is_first = params[:is_first] == "true"
+    idx = params[:i] || 0
+    idx = idx.to_i
+    if idx < -1
+      render json: {success: false, message: "Invalid note id."}
+      return
+    elsif id != -1 && id.nil?
+      render json: {success: false, message: "Missing note id."}
+      return
+    end
+      
+    if idx == 0 || !is_chunks || is_first
+      new_id = current_user.save_note(contents, id, true)
+      success = !new_id.nil?
+    elsif is_chunks
+      current_user.with_lock do
+        success = current_user.append_note(contents, id)
+      end
+    else
+      success = false
+    end
+    render json: {success: success, new_id: new_id}
+  end
+
+  def save_note_title
+    id = params[:note_id]
+    title = params[:title]
+    if id && title
+      #begin
+        #title = Base64.decode64(title)
+        res = current_user.set_note_title(id, title)
+        if !res
+          render json: {success: false, message: "It seems this note does not exist anyone on our servers!"}
+        else
+          render json: {success: true, new_id: id}
+        end
+      #catch
+      #  render json: {success: false, message: "Invalid title format. Please try a different title."}
+      #end
+    else
+      render json: {success: false, message: "Missing title or id."}
+    end
   end
 
   def get_note
@@ -97,7 +138,7 @@ class ApplicationController < ActionController::Base
     if id
       note = current_user.get_note(id)
       if note
-        res = {success: true, contents: note[:note]}
+        res = {success: true, contents: note[:note], title: note[:title]}
       else
         res = {success: false, contents: nil}
       end

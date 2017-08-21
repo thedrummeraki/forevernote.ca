@@ -1,12 +1,20 @@
 
 <header>
+    <style type="text/css">
+      nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
+        line-height: 50px;
+        height: 50px;
+      }
+    </style>
     <nav>
-      <div class="nav-wrapper">
+      <div id="nav-wrapper" class="nav-wrapper">
         <a href="#!" class="brand-logo">Logo</a>
         <ul class="right hide-on-med-and-down">
-          <li note-option note-listener class="hide"><a href="#"><i class="material-icons">edit</i></a></li>
+          <li note-option note-listener class="hide"><a title="Add a new node" href="#" id="add-note"><i class="material-icons">fiber_new</i></a></li>
+          <li note-option note-listener class="hide"><a title="Close this note" href="#" id="close-note"><i class="material-icons">close</i></a></li>
           <li note-option="download" note-listener class="hide"><a href="#"><i class="material-icons">file_download</i></a></li>
-          <li><a href="/logout"><i class="material-icons">exit_to_app</i></a></li>
+          <li><a title="Application settings" href="#settings"><i class="material-icons">settings</i></a></li>
+          <li><a title="Logout" href="/logout"><i class="material-icons">exit_to_app</i></a></li>
         </ul>
       </div>
     </nav>
@@ -58,6 +66,8 @@
           <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
         </ul>
     </div>
+    <div id="progress" class="progress hide in-menu"><div class="indeterminate"></div></div>
+    <div id="progress-value-cont" class="progress hide in-menu"><div id="progress-value" class="determinate"></div></div>
     <div note-listener="init-message" class="vertical-center next-to-side">
       <div class="wrapper">
         <div class="center">
@@ -70,13 +80,23 @@
     <div id="editor" class="editor next-to-side hide">
         <div class="note-title">
             <h4 id="note-title"></h4>
+            <div class="row">
+              <div class="input-field col s12">
+                <input id="note-title-value" type="text" placeholder="Your note title">
+                <label class="hide" for="title">Your note title</label>
+              </div>
+            </div>
         </div>
         <div id="editor-container"></div>
     </div>
 </main>
 
+<script type="text/javascript" src="/js/editor-settings.js"></script>
+
 <script type="text/javascript">
     var current_note = null;
+    var currently_loading = null;
+    var current_note_title = null;
     function extractContent(s) {
       var span= document.createElement('span');
       span.innerHTML= s;
@@ -84,6 +104,36 @@
     };
 
     $(document).ready(function() {
+        var progress_bar = document.getElementById('progress');
+        var progress_bar_value = document.getElementById('progress-value');
+        var progress_bar_value_cont = document.getElementById('progress-value-cont');
+        var nav_wrapper = document.getElementById('nav-wrapper');
+        var close_note = document.getElementById('close-note');
+        var add_note = document.getElementById('add-note');
+        var my_editor = $('#editor-container > .ql-editor');
+        var total_size = null;
+
+        document.getElementById('editor-container').onkeyup = function(e) {
+          console.log("typing...");
+        }
+
+        close_note.onclick = hideCurrentNote;
+        add_note.onclick = hideCurrentNoteAndNewNote;
+        checkLastSelectedNote();
+        checkSaveAutoSettings();
+
+        function setProgress(value) {
+          if (value == null) {
+            progress_bar_value_cont.classList.add('hide');
+            progress_bar_value.classList.add('hide');
+            return;
+          }
+          progress_bar_value_cont.classList.remove('hide');
+          progress_bar_value.classList.remove('hide');
+          value = parseInt(value || 0);
+          progress_bar_value.style.width = value + '%';
+        }
+
         function downloadNote() {
           if (current_note) {
             window.open('/note/download/as_text?note_id=' + current_note);
@@ -91,24 +141,98 @@
             alert("Please create or open a note before attempting to download one.");
           }
         }
-        function saveNote() {
-          var new_content = $('#editor-container > .ql-editor').html();
-          console.log("Saving note... (" + new_content.length + " bytes)");
-          var url = '/save/note?content=' + new_content;
+
+        function setLoading(loading, current_elem) {
+          var _editor = document.getElementById('editor');
+          if (loading) {
+            currently_loading = true;
+            progress_bar.classList.remove('hide');
+            nav_wrapper.classList.add('loading');
+            _editor.classList.add('hide');
+            if (current_elem !== undefined) {
+              current_elem.classList.add('disabled');
+            }
+          } else {
+            _editor.classList.remove('hide');
+            currently_loading = false;
+            progress_bar.classList.add('hide');
+            nav_wrapper.classList.remove('loading');
+            if (current_elem !== undefined) {
+              current_elem.classList.remove('disabled');
+            }
+          }
+        }
+
+        function saveNoteTitle(callback) {
+          var note_title = document.getElementById('note-title-value');
+          note_title = note_title.value;
+          console.log(note_title);
+          // note_title = btoa(note_title);
+          var url = '/save/note/title?title=' + note_title + '&note_id=' + current_note
+          $.ajax({
+            url: url,
+            method: 'patch',
+            success: function(e) {
+              console.log(e);
+              if (e.success && callback) {
+                callback();
+              }
+            }
+          });
+        }
+        function sendNote(chunck, n, size, is_first) {
+          var url = '/save/note?chunks=true&i=' + (size-n) + '&content=' + chunck + '&is_first=' + is_first;
           if (current_note) {
             url = url.concat('&note_id=' + current_note);
           }
+          //console.log("sending at url: " + url);
           $.ajax({
             url: url,
             method: 'post',
             success: function(e) {
+              console.log("Got part response (%d): ", n);
+              console.log(e);
               if (e.success) {
-                current_note = e.new_id;
-                Materialize.toast("Note successfully saved!", 4000, "success-toast");
+                saveNote(n-1);
+                if (e.new_id) {
+                  current_note = e.new_id;
+                }
                 getNotes();
               }
             }
           });
+        }
+        function saveNote(n) {
+          if (n !== undefined) {
+            if (n <= 0) {
+              saveNoteTitle(function() {
+                total_size = null;
+                setProgress(null);
+                console.log("Note successfully saved!");
+                Materialize.toast("Note successfully saved!", 2000, "success-toast");
+              });
+              return;
+            }
+          }
+          var progress_value = 1 - (n / total_size) || 0;
+          progress_value *= 100;
+          
+          setProgress(progress_value);
+
+          var new_content = $('#editor-container > .ql-editor').html();
+          console.log(my_editor);
+          var length = new_content.length;
+          new_content = convertStringToArray(new_content, 1500);
+          console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
+          var first = false;
+          if (n === undefined) {
+            n = new_content.length - 1;
+            first = true;
+            total_size = n + 1;
+          }
+          var index = new_content.length - n - 1;
+          var chunk_to_send = new_content[index];
+          sendNote(chunk_to_send, n, new_content.length, first);
         }
         $(document).keydown(function(e) {
             var key = undefined;
@@ -118,19 +242,45 @@
             }
             if (key && (key == '115' || key == '83' ) && (e.ctrlKey || e.metaKey) && !(e.altKey)) {
                 e.preventDefault();
-                //if (current_note) {
+                if (current_note) {
                   saveNote();
-                //} else {
-                  //alert("Please create or open a note before attempting to save one.");
-                //}
+                } else {
+                  alert("Please create or open a note before attempting to save one.");
+                }
                 return false;
             }
             return true;
-        }); 
+        });
+
+        function saveNoteIfSelected() {
+          if (current_note) {
+            console.log("Automatically saving the current note...");
+            saveNote();
+          }
+        }
+
+        function checkSaveAutoSettings() {
+          var timer_id = 0;
+          if (Settings.is('save-auto')) {
+            timer_id = window.setInterval(saveNoteIfSelected, 10000);
+            console.log(timer_id);
+          } else {
+            window.clearInterval(timer_id);
+          }
+        }
+
         function hideInitMessage(listeners) {
           [].forEach.call(listeners, function(l) {
             if (l.getAttribute("note-listener") == "init-message") {
               l.classList.add('hide');
+            }
+          });
+        }
+
+        function showInitMessage(listeners) {
+          [].forEach.call(listeners, function(l) {
+            if (l.getAttribute("note-listener") == "init-message") {
+              l.classList.remove('hide');
             }
           });
         }
@@ -149,30 +299,99 @@
           });
         }
 
-        function showNote(e) {
-            e.preventDefault();
-            var id = this.getAttribute("note-container");
+        function hideNoteOptions(listeners) {
+          listeners = listeners || document.querySelectorAll("[note-listener]");
+          [].forEach.call(listeners, function(l) {
+            if (l.hasAttribute("note-listener") && l.hasAttribute("note-option")) {
+              l.classList.add('hide');
+            }
+          });
+        }
+
+        function checkLastSelectedNote() {
+          var last_selected_note = Settings.fetch('last-selected-note');
+          if (last_selected_note) {
+            // Materialize.toast('Showing last selected note...', 1000, 'success-toast');
+            showNote(null, last_selected_note);
+          }
+        }
+
+        function showNote(e, by_id) {
+            if (currently_loading) {
+              console.log("Currenlty loading a note...");
+              return;
+            }
+
+            var id;
+            if (e != null) {
+              e.preventDefault();
+              var current_elem = this;
+              id = current_elem.getAttribute("note-container");
+            } else {
+              id = by_id;
+            }
+            if (!id) {
+              console.error("Unspecified id.");
+              return;
+            }
+            Settings.save('last-selected-note', id);
+            setLoading(true, current_elem);
             $.ajax({
               url: '/get/note?note_id=' + id,
               method: 'get',
               success: function(res) {
                 if (res.success) {
                   editor_cont.classList.remove("hide");
+                  $('#editor-container > .ql-editor').html(res.contents);
                   hideInitMessage(note_listeners);
+
                   note_mgmt_icon.innerHTML = "save";
                   note_mgmt_btn.setAttribute("state", "creating");
-                  $('#editor-container > .ql-editor').html(res.contents);
                   current_note = id;
+                  current_note_title = res.title;
+
+                  checkCurrentNoteTitle();
                   showNoteOptions();
                 } else {
-                  console.error("This note was probably deleted off the server.");
+                  console.warn("This note was probably deleted off the server.");
                 }
+                setLoading(false, current_elem);
+              },
+              error: function(e) {
+                current_elem = null;
+                setLoading(false);
               }
             });
+        }
+
+        function hideCurrentNote(e) {
+           if (currently_loading) {
+              return;
+           }
+           e.preventDefault();
+           current_note = null;
+           editor_cont.classList.add("hide");
+           showInitMessage(note_listeners);
+           $('#editor-container > .ql-editor').html("");
+           note_mgmt_icon.innerHTML = "mode_edit";
+           note_mgmt_btn.setAttribute("state", "new");
+           hideNoteOptions();
+        }
+
+        function hideCurrentNoteAndNewNote(e) {
+          if (confirm('You may not have saved your current note, continue? Doing will result in the loss of unsaved data!')) {
+            if (e.preventDefault) {
+              e.preventDefault();
+            }
+            hideCurrentNote(e);
+            showNewEditor();
+            showNoteOptions();
           }
+        }
 
         function buildNote(note) {
           id = note.id;
+          title = note.title || "- Untitled -";
           note = extractContent(note.note);
           if (note.length > 30) {
             note = note.substring(0, 30) + "<i>[...]</i>";
@@ -182,17 +401,21 @@
           return [
             '<a note-container="' + id + '" href="#" class="note-container waves-effect waves-light">',
               '<div class="row">',
-                '<b>Title</b>',
+                '<b>' + title + '</b>',
                 '<p style="margin: 0; margin-top: -20px; padding: 0;" class="note-content">' + note + '</p>',
               '</div>',
             '</a>'
           ].join("");
         }
 
-        function getNotes(callback) {
+        function getNotes(keyword, callback) {
           var cont = document.getElementById("notes-list-side");
+          var url = '/get/notes';
+          if (keyword) {
+            url = url.concat('?keyword=' + btoa(keyword));
+          }
           $.ajax({
-            url: '/get/notes',
+            url: url,
             method: 'get',
             success: function(e) {
               if (e.notes) {
@@ -207,6 +430,28 @@
               }
             }
           });
+        }
+
+        function checkCurrentNoteTitle() {
+          var note_title_input = document.getElementById('note-title-value');
+          if (!current_note_title) {
+            note_title_input.value = "";
+            return;
+          }
+          note_title_input.value = current_note_title;
+          note_title_input.focus();
+          document.getElementById('editor-container').focus();
+        }
+
+        function showNewEditor() {
+          setLoading(true);
+          current_note = true;
+          editor_cont.classList.remove("hide");
+          hideInitMessage(note_listeners);
+          note_mgmt_icon.innerHTML = "save";
+          note_mgmt_btn.setAttribute("state", "creating");
+          document.getElementById('note-title-value').value = "";
+          setLoading(false);
         }
 
         var toolbarOptions = [
@@ -239,7 +484,7 @@
         var editor = new Quill('#editor-container', options);
         var editor_cont = document.getElementById("editor");
         var note_containers = [];
-        getNotes(function(note_containers) {
+        getNotes(null, function(note_containers) {
           [].forEach.call(note_containers, function(nc) {
             nc.onclick = showNote;
           });
@@ -251,12 +496,10 @@
         var note_mgmt_icon = document.getElementById("note-mgnt-icon");
         note_mgmt_btn.onclick = function(e) {
             if (note_mgmt_btn.getAttribute("state") == "new") {
-                if (editor_cont.classList.contains("hide")) {
-                    editor_cont.classList.remove("hide");
-                    hideInitMessage(note_listeners);
-                    note_mgmt_icon.innerHTML = "save";
-                    note_mgmt_btn.setAttribute("state", "creating");
-                }
+              console.log(editor_cont.classList);
+              if (editor_cont.classList.contains("hide")) {
+              }
+                  showNewEditor();
             } else if (note_mgmt_btn.getAttribute("state") == "creating") {
               saveNote();
             }
