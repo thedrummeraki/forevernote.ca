@@ -152,6 +152,38 @@ class ApplicationController < ActionController::Base
     render json: {notes: current_user.get_notes}
   end
 
+  def download_pdf
+    id = params[:note_id]
+    if id
+      note = current_user.get_note(id)
+      if note
+        res = PdfConvert.to_pdf(note)
+        send_data res[:raw], filename: res[:filename], disposition: "inline", type: "application/pdf"
+      else
+        render json: {success: false, url: nil}
+      end
+    else
+      render json: {success: false, message: "No note was specified."}
+    end
+  end
+
+  def download_html
+    id = params[:note_id]
+    if id
+      note = current_user.get_note(id)
+      if note
+        note_text = note[:note]
+        note_text = Nokogiri::HTML(note_text).to_s
+        title = note[:title] || "Untitled-#{note[:id]}"
+        send_data note_text, filename: "forevernote-#{title}.html"
+      else
+        render json: {success: false, url: nil}
+      end
+    else
+      render json: {success: false, message: "No note was specified."}
+    end
+  end
+
   def download_text
     id = params[:note_id]
     if id
@@ -161,7 +193,8 @@ class ApplicationController < ActionController::Base
         note_text = note[:note].gsub("<br>", "\n")
         note_text = note_text.gsub("<br/>", "\n")
         note_text = Nokogiri::HTML(note_text).text
-        send_data note_text, filename: "forevernote-#{note[:id]}.txt"
+        title = note[:title] || "Untitled-#{note[:id]}"
+        send_data note_text, filename: "forevernote-#{title}.txt"
       else
         res = {success: false, url: nil}
         render json: res

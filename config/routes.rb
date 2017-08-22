@@ -14,4 +14,6 @@ Rails.application.routes.draw do
   patch '/save/note/title' => 'application#save_note_title'
 
   get '/note/download/as_text' => 'application#download_text'
+  get '/note/download/as_html' => 'application#download_html'
+  get '/note/download/as_pdf' => 'application#download_pdf'
 end

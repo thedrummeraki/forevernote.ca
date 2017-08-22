@@ -6,7 +6,7 @@ var Settings = (function() {
             enabled: true,
             time: 60,
         },
-        "download-format": "pdf",
+        "download-format": "html",
         "theme-color": "default"
     };
     var init = false;
@@ -16,6 +16,18 @@ var Settings = (function() {
         settings[key] = value;
         _save();
         return value;
+    }
+
+    var getDownloadURL = function() {
+        var format = getSetting('download-format');
+        console.log(format);
+        if (format == "text") {
+            return "/note/download/as_text";
+        } else if (format == "pdf") {
+            return '/note/download/as_pdf';
+        } else {
+            return '/note/download/as_html'
+        }
     }
 
     var getSetting = function(key, default_value) {
@@ -87,5 +99,6 @@ var Settings = (function() {
         plural: getPlural,
         background: setBackground,
         is: checkBool,
+        getDownloadURL: getDownloadURL,
     }
 })();

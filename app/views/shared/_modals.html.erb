@@ -10,15 +10,16 @@
                         <p>Edit here the application's default behaviour.</p>
                     </div>
                 </div>
-                <h5>General</h5>
-                <p>Do you want all notes to be saved on their own?</p>
+                <h5>Save note automatically</h5>
+                <p>Do you want all notes to be saved on their own? <b>If the option below is checked, the note will be saved 1 second after you stop typing.</b></p>
                 <div class="center">
                     <div class="row">
                         <input settings-switch="save-auto" settings-listener="notes-saving" settings-value="true" type="checkbox" class="filled-in" name="save-auto" id="save-auto">
-                        <label for="save-auto">Save notes automatically (refresh the page for changes to take effect)</label>
+                        <label for="save-auto">Save notes automatically</label>
                     </div>
                 </div>
 
+                <h5>Default theme color</h5>
                 <p>Which theme color would please you most?</p>
                 <div class="center">
                   <div class="input-field col s12">
@@ -38,20 +39,23 @@
                   </div>
                 </div>
 
-                <p>Do you want to be logged out after a certain time?</p>
-                <div class="center">
-                    <div class="row">
-                        <div >
-                            <input type="checkbox" name="logout-after" class="filled-in" id="logout-after" checked="checked">
-                            <label for="logout-after">I want to be logged out after...</label>
-                        </div>
-                        <div class="center">
-                            <form>
-                                <input type="radio" id="5-mins" settings-listener="logout-after" settings-value="5" name="time"><label for="5-mins">5 mins</label>
-                                <input type="radio" id="10-mins" settings-listener="logout-after" settings-value="10" name="time"><label for="10-mins">10 mins</label>
-                                <input type="radio" id="30-mins" settings-listener="logout-after" settings-value="30" name="time"><label for="30-mins">30 mins</label>
-                                <input type="radio" id="1-hour" settings-listener="logout-after" settings-value="60" name="time" checked><label for="1-hour">1h</label>
-                            </form>
+                <div class="hide">
+                    <h5>Automatic Logout</h5>
+                    <p>Do you want to be logged out after a certain time?</p>
+                    <div class="center">
+                        <div class="row">
+                            <div >
+                                <input type="checkbox" name="logout-after" class="filled-in" id="logout-after" checked="checked">
+                                <label for="logout-after">I want to be logged out after...</label>
+                            </div>
+                            <div class="center">
+                                <form>
+                                    <input type="radio" id="5-mins" settings-listener="logout-after" settings-value="5" name="time"><label for="5-mins">5 mins</label>
+                                    <input type="radio" id="10-mins" settings-listener="logout-after" settings-value="10" name="time"><label for="10-mins">10 mins</label>
+                                    <input type="radio" id="30-mins" settings-listener="logout-after" settings-value="30" name="time"><label for="30-mins">30 mins</label>
+                                    <input type="radio" id="1-hour" settings-listener="logout-after" settings-value="60" name="time" checked><label for="1-hour">1h</label>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -72,7 +76,7 @@
                     <!--</div>-->
                 <!--</div>-->
 
-                <h5>Downloads</h5>
+                <h5>Default download option</h5>
                 <div class="row">
                     <p>Default download format:</p>
                     <div class="container">
@@ -215,13 +219,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="center">
+                            <a href="#" id="save-profile" class="btn waves-effect waves-light">Save</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
-            <a href="#!" class="modal-action modal-close waves-effect green lighten-1 btn-flat">SAVE</a>
         </div>
     </div>
 </div>
@@ -230,5 +236,10 @@
     $(document).ready(function() {
         $('select').material_select();
         $('.modal').modal();
+        $('#modal_user_edit').modal({
+            complete: function(e) {
+                console.log("test complete");
+            }
+        });
     });
 </script>

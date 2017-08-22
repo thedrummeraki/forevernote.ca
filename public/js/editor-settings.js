@@ -51,7 +51,6 @@ $(document).ready(function() {
                 if (theme_options.getAttribute('data-color') == current_color) {
                     theme_options.setAttribute('selected', '');
                     theme_options.classList.add('active');
-                    console.log(theme_color);
                 } else {
                     theme_options.removeAttribute('selected');
                     theme_options.classList.remove('active');

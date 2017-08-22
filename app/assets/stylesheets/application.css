@@ -35,7 +35,7 @@ a {
   background: #ffcdd2 !important;
 }
 .nav-wrapper.pink {
-  background: #f06292;
+  background: #f48fb1 !important;
 }
 .nav-wrapper.pink.loading {
   background: #f8bbd0 !important;
@@ -309,7 +309,7 @@ li.search .search-wrapper i.material-icons {
 }
 
 .editor .note-title {
-    padding-left: 20px;
+    /*padding-left: 20px;*/
     /*Below breaks the note-taking icons, commented out in case below line was important*/
     /*width: 50%;*/
     font-weight: bold;
@@ -319,7 +319,7 @@ li.search .search-wrapper i.material-icons {
     margin-bottom: 0;
 }
 
-.editor input[type="text"] {
+.editor input[type="text"].title {
     height: 3em;
     font-size: 150%;
     border-bottom: 1px solid #fff;

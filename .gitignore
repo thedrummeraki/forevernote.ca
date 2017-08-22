@@ -13,9 +13,11 @@
 
 # Ignore all logfiles and tempfiles.
 /log/*
+/pdf/*
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+!/pdf/.keep
 
 # Ignore Byebug command history file.
 .byebug_history

@@ -79,10 +79,9 @@
     </div>
     <div id="editor" class="editor next-to-side hide">
         <div class="note-title">
-            <h4 id="note-title"></h4>
             <div class="row">
               <div class="input-field col s12">
-                <input id="note-title-value" type="text" placeholder="Your note title">
+                <input id="note-title-value" type="text" class="title" placeholder="Your note title">
                 <label class="hide" for="title">Your note title</label>
               </div>
             </div>
@@ -110,17 +109,16 @@
         var nav_wrapper = document.getElementById('nav-wrapper');
         var close_note = document.getElementById('close-note');
         var add_note = document.getElementById('add-note');
+        var save_profile = document.getElementById('save-profile');
         var my_editor = $('#editor-container > .ql-editor');
         var total_size = null;
 
-        document.getElementById('editor-container').onkeyup = function(e) {
-          console.log("typing...");
-        }
-
         close_note.onclick = hideCurrentNote;
         add_note.onclick = hideCurrentNoteAndNewNote;
+        save_profile.onclick = saveProfile;
+
         checkLastSelectedNote();
-        checkSaveAutoSettings();
+        checkAndSetupSaveAutoSettings();
 
         function setProgress(value) {
           if (value == null) {
@@ -136,7 +134,7 @@
 
         function downloadNote() {
           if (current_note) {
-            window.open('/note/download/as_text?note_id=' + current_note);
+            window.open(Settings.getDownloadURL().concat('?note_id=' + current_note));
           } else {
             alert("Please create or open a note before attempting to download one.");
           }
@@ -161,6 +159,10 @@
               current_elem.classList.remove('disabled');
             }
           }
+        }
+
+        function saveProfile(e) {
+          e.preventDefault();
         }
 
         function saveNoteTitle(callback) {
@@ -202,14 +204,16 @@
             }
           });
         }
-        function saveNote(n) {
+        function saveNote(n, hide_notification) {
           if (n !== undefined) {
             if (n <= 0) {
               saveNoteTitle(function() {
                 total_size = null;
-                setProgress(null);
+                if (!hide_notification) {
+                  setProgress(null);
+                  Materialize.toast("Note successfully saved!", 2000, "success-toast");
+                }
                 console.log("Note successfully saved!");
-                Materialize.toast("Note successfully saved!", 2000, "success-toast");
               });
               return;
             }
@@ -217,7 +221,9 @@
           var progress_value = 1 - (n / total_size) || 0;
           progress_value *= 100;
           
-          setProgress(progress_value);
+          if (!hide_notification) {
+            setProgress(progress_value);
+          }
 
           var new_content = $('#editor-container > .ql-editor').html();
           console.log(my_editor);
@@ -255,17 +261,27 @@
         function saveNoteIfSelected() {
           if (current_note) {
             console.log("Automatically saving the current note...");
-            saveNote();
+            saveNote(undefined, true);
           }
         }
 
-        function checkSaveAutoSettings() {
-          var timer_id = 0;
-          if (Settings.is('save-auto')) {
-            timer_id = window.setInterval(saveNoteIfSelected, 10000);
-            console.log(timer_id);
-          } else {
-            window.clearInterval(timer_id);
+        function checkAndSetupSaveAutoSettings() {
+          var editor_cont = document.getElementById('editor-container');
+          var typing_timer;
+          var done_typing_timeout = 1000;
+          editor_cont.onkeyup = function(e) {
+            if (Settings.is('save-auto')) {
+              clearTimeout(typing_timer);
+              typing_timer = setTimeout(done_typing, done_typing_timeout);
+            }
+          }
+          editor_cont.onkeydown = function(e) {
+            if (Settings.is('save-auto')) {
+              clearTimeout(typing_timer);
+            }
+          }
+          var done_typing = function() {
+            saveNoteIfSelected();
           }
         }
 
