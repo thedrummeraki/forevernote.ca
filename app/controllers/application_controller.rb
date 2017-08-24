@@ -146,7 +146,30 @@ class ApplicationController < ActionController::Base
   end
 
   def get_notes
-    render json: {notes: current_user.get_notes}
+    keyword = params[:keyword]
+    is_b64 = params[:b64]
+    is_uri = params[:uri]
+    if keyword
+      if is_b64 == "true"
+        begin
+          keyword = Base64.decode64(keyword)
+        rescue Exception => e
+          render json: {message: "Invalid base 64 keyword."}; return
+        end
+      end
+      if is_uri == "true"
+        begin
+          keyword = URI.unescape keyword
+        rescue Exception => e
+          render json: {message: "Invalid URI escaped keyword."}; return
+        end
+      end
+      p "keyword: #{keyword}"
+      notes = current_user.find_notes keyword, {:b64 => is_b64 == "true", uri: is_uri == "true"}
+    else
+      notes = current_user.get_notes
+    end
+    render json: {notes: notes}
   end
 
   def download_pdf

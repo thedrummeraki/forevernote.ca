@@ -4,14 +4,14 @@ var Settings = (function() {
         "-1": {text: 'Whoops, something went wrong! Please try again.', color: 'red'},
         0: {text: ''},
         1: {text: 'Creating note...'},
-        2: {text: 'Writing to node...'},
+        2: {text: 'Writing to note...'},
         3: {text: 'Changing settings...', color: 'brown'},
         4: {text: 'Saving note ({0}%)...', color: 'orange'},
         5: {text: 'Note saved!', color: 'green', timeout: 2000},
         6: {text: 'Last select note loaded!', color: 'green', timeout: 5000},
     };
     var default_settings = {
-        "save-auto": true,
+        "save-auto": false,
         "logout-after": {
             enabled: true,
             time: 60,

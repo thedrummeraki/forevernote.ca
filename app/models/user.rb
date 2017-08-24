@@ -89,6 +89,27 @@ class User < ApplicationRecord
         nil
     end
 
+    def find_notes keyword, options={}
+        notes = []
+        keys = [:id, :note, :title]
+        self.get_notes.each do |note|
+            keys.each do |key|
+                value = note[key]
+                if key == :note
+                    value = Base64.decode64(value) if options[:b64]
+                    value = URI.unescape(value) if options[:uri]
+                end
+                begin
+                    if value.downcase.include? keyword.downcase
+                        notes.push(note)
+                    end
+                rescue Encoding::CompatibilityError
+                end
+            end
+        end
+        notes
+    end
+
     def get_notes
         if self.notes.nil?
             self.notes = []

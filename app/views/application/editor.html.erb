@@ -70,8 +70,8 @@
     <div note-listener="init-message" class="vertical-center next-to-side">
       <div class="wrapper">
         <div class="center">
-          <div class="nothing">
-            - Please select a note on the side or click on the button below to create a new note -
+          <div id="loading-notes" class="nothing">
+            - Loading, shouldn't take too long... -
           </div>
         </div>
       </div>
@@ -114,6 +114,8 @@
         var close_note = document.getElementById('close-note');
         var add_note = document.getElementById('add-note');
         var save_profile = document.getElementById('save-profile');
+        var search_input = document.getElementById('search');
+        var first_message = document.getElementById('loading-notes');
         var my_editor = $('#editor-container > .ql-editor');
         var total_size = null;
 
@@ -125,6 +127,7 @@
         setStatus(Settings.STATUS_INIT);
         checkLastSelectedNote();
         checkAndSetupSaveAutoSettings();
+        setupSearchBar();
 
         function setProgress(value) {
           return;
@@ -310,6 +313,18 @@
           }
         }
 
+        function setupSearchBar() {
+          search_input.onkeyup = function(e) {
+            var keyword = this.value;
+            var note_containers = [];
+            getNotes(keyword, function(note_containers) {
+              [].forEach.call(note_containers, function(nc) {
+                nc.onclick = showNote;
+              });
+            });
+          }
+        }
+
         function checkAndSetupSaveAutoSettings() {
           var editor_cont = document.getElementById('editor-container');
           var typing_timer;
@@ -479,7 +494,7 @@
           var cont = document.getElementById("notes-list-side");
           var url = '/get/notes';
           if (keyword) {
-            url = url.concat('?keyword=' + btoa(keyword));
+            url = url.concat('?b64=true&uri=true&keyword=' + safeEncode(keyword));
           }
           $.ajax({
             url: url,
@@ -556,6 +571,7 @@
         var editor_cont = document.getElementById("editor");
         var note_containers = [];
         getNotes(null, function(note_containers) {
+          first_message.innerHTML = "- Please select a note on the side or click on the button below to create a new note -";
           [].forEach.call(note_containers, function(nc) {
             nc.onclick = showNote;
           });
