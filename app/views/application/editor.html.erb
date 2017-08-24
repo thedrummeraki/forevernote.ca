@@ -8,21 +8,20 @@
     </style>
     <nav>
       <div id="nav-wrapper" class="nav-wrapper">
-        <a href="#!" class="brand-logo">Logo</a>
+        <a href="/" class="brand-logo">ForeverNote</a>
+        <a href="#" data-activates="nav-mobile" class="button-collapse top-nav waves-effect waves-light circle hide-on-large-only">
+            <i class="material-icons">menu</i>
+        </a>
         <ul class="right hide-on-med-and-down">
           <li note-option note-listener class="hide"><a title="Add a new node" href="#" id="add-note"><i class="material-icons">fiber_new</i></a></li>
           <li note-option note-listener class="hide"><a title="Close this note" href="#" id="close-note"><i class="material-icons">close</i></a></li>
           <li note-option="download" note-listener class="hide"><a href="#"><i class="material-icons">file_download</i></a></li>
           <li><a title="Application settings" href="#settings"><i class="material-icons">settings</i></a></li>
+          <li class="hide"><a title="Need some help?" href="#help"><i class="material-icons">help</i></a></li>
           <li><a title="Logout" href="/logout"><i class="material-icons">exit_to_app</i></a></li>
         </ul>
       </div>
     </nav>
-    <div class="container">
-        <a href="#" data-activates="nav-mobile" class="button-collapse top-nav waves-effect waves-light circle hide-on-large-only">
-            <i class="material-icons">menu</i>
-        </a>
-    </div>
     <ul id="nav-mobile" class="side-nav fixed">
         <div class="container">
             <div class="center">
@@ -66,8 +65,8 @@
           <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
         </ul>
     </div>
-    <div id="progress" class="progress hide in-menu"><div class="indeterminate"></div></div>
-    <div id="progress-value-cont" class="progress hide in-menu"><div id="progress-value" class="determinate"></div></div>
+    <!-- <div id="progress" class="progress hide in-menu"><div class="indeterminate"></div></div>
+    <div id="progress-value-cont" class="progress hide in-menu"><div id="progress-value" class="determinate"></div></div> -->
     <div note-listener="init-message" class="vertical-center next-to-side">
       <div class="wrapper">
         <div class="center">
@@ -80,9 +79,14 @@
     <div id="editor" class="editor next-to-side hide">
         <div class="note-title">
             <div class="row">
-              <div class="input-field col s12">
+              <div class="input-field col s9 m9">
                 <input id="note-title-value" type="text" class="title" placeholder="Your note title">
                 <label class="hide" for="title">Your note title</label>
+              </div>
+              <div class="col s3 m3">
+                <div class="saving right">
+                  <span note-status></span>
+                </div>
               </div>
             </div>
         </div>
@@ -117,10 +121,13 @@
         add_note.onclick = hideCurrentNoteAndNewNote;
         save_profile.onclick = saveProfile;
 
+        Settings.background();
+        setStatus(Settings.STATUS_INIT);
         checkLastSelectedNote();
         checkAndSetupSaveAutoSettings();
 
         function setProgress(value) {
+          return;
           if (value == null) {
             progress_bar_value_cont.classList.add('hide');
             progress_bar_value.classList.add('hide');
@@ -130,6 +137,32 @@
           progress_bar_value.classList.remove('hide');
           value = parseInt(value || 0);
           progress_bar_value.style.width = value + '%';
+        }
+
+        function setStatus(value, format) {
+          var note_statuses = document.querySelectorAll("[note-status]");
+          var status = Settings.getStatus(value);
+          if (status === undefined || status === null) {
+            console.warn("invalid status %d", value);
+            return;
+          }
+          [].forEach.call(note_statuses, function(note_status) {
+            var text = status.text;
+            if (format !== undefined) {
+              text = text.format(format);
+            }
+            note_status.innerHTML = text;
+            if (status.color) {
+              note_status.style.color = status.color;
+            } else {
+              note_status.style.color = "";
+            }
+            if (status.timeout) {
+              setTimeout(function() {
+                setStatus(Settings.STATUS_INIT);
+              }, status.timeout);
+            }
+          });
         }
 
         function downloadNote() {
@@ -142,10 +175,10 @@
 
         function setLoading(loading, current_elem) {
           var _editor = document.getElementById('editor');
+          nav_wrapper.classList.add('loading');
           if (loading) {
             currently_loading = true;
-            progress_bar.classList.remove('hide');
-            nav_wrapper.classList.add('loading');
+            // progress_bar.classList.remove('hide');
             _editor.classList.add('hide');
             if (current_elem !== undefined) {
               current_elem.classList.add('disabled');
@@ -153,7 +186,7 @@
           } else {
             _editor.classList.remove('hide');
             currently_loading = false;
-            progress_bar.classList.add('hide');
+            // progress_bar.classList.add('hide');
             nav_wrapper.classList.remove('loading');
             if (current_elem !== undefined) {
               current_elem.classList.remove('disabled');
@@ -168,7 +201,7 @@
         function saveNoteTitle(callback) {
           var note_title = document.getElementById('note-title-value');
           note_title = note_title.value;
-          console.log(note_title);
+          console.log("Title: " + note_title);
           // note_title = btoa(note_title);
           var url = '/save/note/title?title=' + note_title + '&note_id=' + current_note
           $.ajax({
@@ -184,13 +217,16 @@
         }
         function sendNote(chunck, n, size, is_first) {
           var url = '/save/note?chunks=true&i=' + (size-n) + '&content=' + chunck + '&is_first=' + is_first;
-          if (current_note) {
+          if (current_note && current_note != true) {
             url = url.concat('&note_id=' + current_note);
           }
-          //console.log("sending at url: " + url);
+          // console.log("Chunk (%d bytes):", chunck.length)
+          // console.log(chunck);
+          // console.log("sending at url: " + url);
           $.ajax({
             url: url,
             method: 'post',
+            async: true,
             success: function(e) {
               console.log("Got part response (%d): ", n);
               console.log(e);
@@ -201,17 +237,22 @@
                 }
                 getNotes();
               }
+            },
+            error: function(e) {
+              setStatus(Settings.STATUS_ERROR);
+              return;
             }
           });
         }
         function saveNote(n, hide_notification) {
           if (n !== undefined) {
-            if (n <= 0) {
+            if (n < 0) {
               saveNoteTitle(function() {
                 total_size = null;
                 if (!hide_notification) {
                   setProgress(null);
-                  Materialize.toast("Note successfully saved!", 2000, "success-toast");
+                  // Materialize.toast("Note successfully saved!", 2000, "success-toast");
+                  setStatus(Settings.STATUS_SAVED);
                 }
                 console.log("Note successfully saved!");
               });
@@ -220,15 +261,18 @@
           }
           var progress_value = 1 - (n / total_size) || 0;
           progress_value *= 100;
+          progress_value = parseInt(progress_value);
+          console.log(progress_value);
+          setStatus(Settings.STATUS_SAVING, progress_value);
           
           if (!hide_notification) {
             setProgress(progress_value);
           }
 
           var new_content = $('#editor-container > .ql-editor').html();
-          console.log(my_editor);
           var length = new_content.length;
-          new_content = convertStringToArray(new_content, 1500);
+          new_content = safeEncode(new_content);
+          new_content = convertStringToArray(new_content, 1000);
           console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
           var first = false;
           if (n === undefined) {
@@ -249,6 +293,7 @@
             if (key && (key == '115' || key == '83' ) && (e.ctrlKey || e.metaKey) && !(e.altKey)) {
                 e.preventDefault();
                 if (current_note) {
+                  setStatus(Settings.STATUS_SAVING);
                   saveNote();
                 } else {
                   alert("Please create or open a note before attempting to save one.");
@@ -270,18 +315,21 @@
           var typing_timer;
           var done_typing_timeout = 1000;
           editor_cont.onkeyup = function(e) {
-            if (Settings.is('save-auto')) {
-              clearTimeout(typing_timer);
-              typing_timer = setTimeout(done_typing, done_typing_timeout);
-            }
+            clearTimeout(typing_timer);
+            typing_timer = setTimeout(done_typing, done_typing_timeout);
           }
           editor_cont.onkeydown = function(e) {
-            if (Settings.is('save-auto')) {
-              clearTimeout(typing_timer);
+            var is_not_typing_key = e.ctrlKey || e.shiftKey || e.altKey || (e.keyCode > 36 && e.keyCode < 41);
+            if (!is_not_typing_key) {
+              setStatus(Settings.STATUS_WRITING);
             }
+            clearTimeout(typing_timer);
           }
           var done_typing = function() {
-            saveNoteIfSelected();
+            setStatus(Settings.STATUS_INIT);
+            if (Settings.is('save-auto')) {
+              saveNoteIfSelected();
+            }
           }
         }
 
@@ -329,6 +377,7 @@
           if (last_selected_note) {
             // Materialize.toast('Showing last selected note...', 1000, 'success-toast');
             showNote(null, last_selected_note);
+            setStatus(Settings.STATUS_LAST_NOTE_LOADED);
           }
         }
 
@@ -358,7 +407,7 @@
               success: function(res) {
                 if (res.success) {
                   editor_cont.classList.remove("hide");
-                  $('#editor-container > .ql-editor').html(res.contents);
+                  $('#editor-container > .ql-editor').html(safeDecode(res.contents));
                   hideInitMessage(note_listeners);
 
                   note_mgmt_icon.innerHTML = "save";
@@ -392,6 +441,7 @@
            note_mgmt_icon.innerHTML = "mode_edit";
            note_mgmt_btn.setAttribute("state", "new");
            hideNoteOptions();
+           Settings.clear('last-selected-note');
         }
 
         function hideCurrentNoteAndNewNote(e) {
@@ -409,6 +459,7 @@
           id = note.id;
           title = note.title || "- Untitled -";
           note = extractContent(note.note);
+          note = safeDecode(note, true);
           if (note.length > 30) {
             note = note.substring(0, 30) + "<i>[...]</i>";
           } else if (note.trim().length == 0) {
@@ -455,7 +506,7 @@
             return;
           }
           note_title_input.value = current_note_title;
-          note_title_input.focus();
+          // note_title_input.focus();
           document.getElementById('editor-container').focus();
         }
 
@@ -466,8 +517,12 @@
           hideInitMessage(note_listeners);
           note_mgmt_icon.innerHTML = "save";
           note_mgmt_btn.setAttribute("state", "creating");
-          document.getElementById('note-title-value').value = "";
           setLoading(false);
+          Settings.clear('last-selected-note');
+
+          var title_input = document.getElementById('note-title-value');
+          title_input.value = "";
+          title_input.focus();
         }
 
         var toolbarOptions = [
@@ -515,12 +570,31 @@
               console.log(editor_cont.classList);
               if (editor_cont.classList.contains("hide")) {
               }
-                  showNewEditor();
+              showNewEditor();
             } else if (note_mgmt_btn.getAttribute("state") == "creating") {
               saveNote();
             }
         };
+        var title_input = document.getElementById('note-title-value');
+        var ql_editor = document.getElementsByClassName('ql-editor');
 
-        
+        var titleInputToEditor = function(e) {
+          if (e.keyCode == 13 || e.keyCode == 9) {
+            e.preventDefault();
+            ql_editor[0].focus();
+            console.log(e.keyCode);
+            console.log("on editor...");
+          }
+        }
+        var editorToTitleInput = function(e) {
+          if (e.keyCode == 9 && e.shiftKey) {
+            e.preventDefault();
+            console.log("shift key + tab")
+          }
+        }
+        title_input.onkeyup = titleInputToEditor;
+        title_input.onkeydown = titleInputToEditor;
+        ql_editor.onkeyup = editorToTitleInput;
+        ql_editor.onkeydown = editorToTitleInput;
     });
 </script>

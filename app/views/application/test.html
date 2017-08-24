@@ -1,0 +1,22 @@
+<script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyBkrnT1mZtF5JORn7S_4CnJcAMUSF3FOho",
+        authDomain: "forevernote-c0238.firebaseapp.com",
+        databaseURL: "https://forevernote-c0238.firebaseio.com",
+        projectId: "forevernote-c0238",
+        storageBucket: "",
+        messagingSenderId: "1098443084928"
+    };
+    firebase.initializeApp(config);
+    var database = firebase.database();
+
+    function writeUserData(userId, name, email, imageUrl) {
+        database.ref('users/' + userId).set({
+        username: name,
+        email: email,
+        profile_picture : imageUrl
+        });
+    }
+</script>

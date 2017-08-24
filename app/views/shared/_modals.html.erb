@@ -1,5 +1,5 @@
 <div>
-    <div id="settings" class="modal modal-fixed-footer">
+    <div id="settings" class="modal settings-modal modal-fixed-footer">
         <div class="modal-content">
             <div class="center">
                 <h4>Settings</h4>
@@ -92,7 +92,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat">Dismiss</a>
+            <a href="#" class="dismiss modal-action modal-close waves-effect waves-red btn-flat">Dismiss</a>
         </div>
     </div>
     <div id="help" class="modal">
@@ -159,7 +159,7 @@
               </ul>
         </div>
         <div class="modal-footer">
-            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">DISMISS</a>
+            <a href="#" class="dismiss modal-action modal-close waves-effect waves-green btn-flat">DISMISS</a>
         </div>
     </div>
     <div id="modal_user_edit" class="modal modal-fixed-footer">
@@ -227,7 +227,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+            <a href="#" class="dismiss modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
         </div>
     </div>
 </div>
@@ -236,6 +236,13 @@
     $(document).ready(function() {
         $('select').material_select();
         $('.modal').modal();
+        var closeDismissableModal = function(e) {
+            e.preventDefault();
+        };
+        [].forEach.call(document.getElementsByClassName('dismiss'), function(dismissable) {
+            dismissable.onclick = closeDismissableModal;
+        });
+
         $('#modal_user_edit').modal({
             complete: function(e) {
                 console.log("test complete");

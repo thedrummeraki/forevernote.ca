@@ -94,7 +94,19 @@ class User < ApplicationRecord
             self.notes = []
             self.save
         end
-        self.notes.reject { |n| n[:note].nil? }
+        notes = self.notes.reject { |n| n[:note].nil? }
+        #res = []
+        #notes.each do |note|
+        #    contnt = note[:note]
+        #    begin
+                #contnt = Base64.decode64 contnt
+                #contnt = URI.unescape contnt
+        #        note[:note] = contnt
+        #    rescue Exception => e
+        #    end
+        #    res.push note
+        #end
+        #res
     end
 
     has_secure_password

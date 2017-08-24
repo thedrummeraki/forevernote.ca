@@ -10,6 +10,12 @@ class PdfConvert
         p note
         title = note[:title] || "Untitled-#{note[:id]}"
         html = note[:note]
+        begin
+          html = Base64.decode64(html)
+          html = URI.unescape html
+        rescue Exception => e
+          p e
+        end
         filename = "forevernote-#{title}.pdf"
         pdf = WickedPdf.new.pdf_from_string html
         {raw: pdf, filename: filename}

@@ -16,4 +16,7 @@ Rails.application.routes.draw do
   get '/note/download/as_text' => 'application#download_text'
   get '/note/download/as_html' => 'application#download_html'
   get '/note/download/as_pdf' => 'application#download_pdf'
+
+  get '/test' => 'application#test'
+  post '/test/post' => 'application#test_post'
 end

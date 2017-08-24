@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
-  before_filter {
+  before_action {
     @username = params[:username]
   }
 
@@ -95,9 +95,6 @@ class ApplicationController < ActionController::Base
     if idx < -1
       render json: {success: false, message: "Invalid note id."}
       return
-    elsif id != -1 && id.nil?
-      render json: {success: false, message: "Missing note id."}
-      return
     end
       
     if idx == 0 || !is_chunks || is_first
@@ -173,6 +170,12 @@ class ApplicationController < ActionController::Base
       note = current_user.get_note(id)
       if note
         note_text = note[:note]
+        begin
+          note_text = Base64.decode64(note_text)
+          note_text = URI.unescape note_text
+        rescue Exception => e
+          p e
+        end
         note_text = Nokogiri::HTML(note_text).to_s
         title = note[:title] || "Untitled-#{note[:id]}"
         send_data note_text, filename: "forevernote-#{title}.html"
@@ -202,6 +205,12 @@ class ApplicationController < ActionController::Base
     else
       render json: {success: false, message: "No note was specified."}
     end
+  end
+
+  def test; end
+
+  def test_post
+    render json: {response: "This is my response."}
   end
 
 end

@@ -264,7 +264,7 @@ li.search .search-wrapper i.material-icons {
     /* left: 480px;
     margin-right: 480px; */
     position: relative;
-    height: 88vh;
+    height: 85vh;
     margin-top: -15px;
 }
 
@@ -308,6 +308,14 @@ li.search .search-wrapper i.material-icons {
     width: 60%;
 }
 
+.editor .saving {
+  position: relative;
+  margin-top: 2.3rem;
+}
+
+.editor .saving span {
+}
+
 .editor .note-title {
     /*padding-left: 20px;*/
     /*Below breaks the note-taking icons, commented out in case below line was important*/
@@ -320,7 +328,7 @@ li.search .search-wrapper i.material-icons {
 }
 
 .editor input[type="text"].title {
-    height: 3em;
+    height: 2.5em;
     font-size: 150%;
     border-bottom: 1px solid #fff;
     margin: 0;
@@ -332,4 +340,11 @@ li.search .search-wrapper i.material-icons {
 
 a.note-container {
   height: 75px !important;
+}
+
+@media (max-width: 992px) {
+    .next-to-side {
+        left: 0;
+        margin-right: 0;
+    }
 }
