@@ -3,6 +3,7 @@ require 'openssl'
 class User < ApplicationRecord
 
     serialize :notes
+    include ChunkModeler
 
     def get_email_hash
         return "00000000000000000000000000000000" if self.email_address.strip.to_s.size == 0
@@ -14,19 +15,27 @@ class User < ApplicationRecord
         self.name || self.username
     end
 
-    def save_note(note, id, get_id=false)
-        p "gen id"
-        id = id || OpenSSL::Digest::SHA256.new(Time.now.to_s).to_s
+    def create_note
+        empty_note = {id: gen_id}
+        empty_note[:title] = ""
+        self.notes.push empty_note
+        {success: self.save, new_id: empty_note[:id]}
+    end
+
+    def get_note_pos id
         i = -1
         pos = -1
         get_notes.each do |n|
             if i == -1; i = 0; end
-            if n[:id] == id
-                pos = i
-                break
-            end
+            return i if n[:id] == id
             i += 1
         end
+        pos
+    end
+
+    def save_note(note, id, get_id=false)
+        gen_id id
+        pos = self.get_note_pos id
         if note.to_s.strip.size > 0
             if pos == -1
                 self.notes.push({id: id, note: note})
@@ -120,7 +129,7 @@ class User < ApplicationRecord
             self.notes = []
             self.save
         end
-        notes = self.notes.reject { |n| n[:note].nil? }
+        notes = self.notes.reject { |n| n[:id].nil? }
         #res = []
         #notes.each do |note|
         #    contnt = note[:note]
@@ -133,6 +142,10 @@ class User < ApplicationRecord
         #    res.push note
         #end
         #res
+    end
+
+    def gen_id id=nil
+        id || OpenSSL::Digest::SHA256.new(Time.now.to_s).to_s
     end
 
     has_secure_password

@@ -6,7 +6,7 @@ Rails.application.routes.draw do
 
   get '/register' => 'application#register'
   post '/register' => 'application#do_register'
-  post '/user/update' => 'application#user_update'
+  post '/user/update' => 'users#user_update'
 
   get '/editor' => 'authenticated#editor'
 
@@ -22,7 +22,7 @@ Rails.application.routes.draw do
 
   get '/user/getid' => 'authenticated#get_current_user_id'
   get '/user/getname' => 'authenticated#get_current_user_name'
-  
+
   get '/test' => 'application#test'
   post '/test/post' => 'application#test_post'
 end

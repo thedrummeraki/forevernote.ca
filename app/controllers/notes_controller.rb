@@ -1,5 +1,18 @@
 class NotesController < AuthenticatedController
 
+  def request_id
+    render json: current_user.create_note
+  end
+
+  def reject_id
+    id = params[:note_id]
+    unless id.nil?
+        render json: {success: current_user.delete_note(id)}
+    else
+        render json: {success: false, message: "There is nothing to reject."}
+    end
+  end
+
   def save_note
     contents = params[:content]
     id = params[:note_id]
@@ -13,12 +26,13 @@ class NotesController < AuthenticatedController
     end
       
     if idx == 0 || !is_chunks || is_first
-      new_id = current_user.save_note(contents, id, true)
+      # new_id = current_user.save_note(contents, id, true)
+      new_id = current_user.save_chunk(contents, id, idx, true)
       success = !new_id.nil?
     elsif is_chunks
-      current_user.with_lock do
-        success = current_user.append_note(contents, id)
-      end
+      #current_user.with_lock do
+      #  success = current_user.append_note(contents, id)
+      #end
     else
       success = false
     end
