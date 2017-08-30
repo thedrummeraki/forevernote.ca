@@ -2,25 +2,27 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root 'application#root'
   post '/login' => 'application#check_login'
-  get '/logout' => 'application#logout'
+  get '/logout' => 'users#logout'
 
   get '/register' => 'application#register'
   post '/register' => 'application#do_register'
   post '/user/update' => 'application#user_update'
 
-  get '/editor' => 'application#editor'
-  get '/get/note' => 'application#get_note'
-  get '/get/notes' => 'application#get_notes'
-  post '/save/note' => 'application#save_note'
-  delete '/delete/note' => 'application#delete_note'
-  patch '/save/note/title' => 'application#save_note_title'
+  get '/editor' => 'authenticated#editor'
 
-  get '/note/download/as_text' => 'application#download_text'
-  get '/note/download/as_html' => 'application#download_html'
-  get '/note/download/as_pdf' => 'application#download_pdf'
+  get '/get/note' => 'notes#get_note'
+  get '/get/notes' => 'notes#get_notes'
+  post '/save/note' => 'notes#save_note'
+  delete '/delete/note' => 'notes#delete_note'
+  patch '/save/note/title' => 'notes#save_note_title'
 
-  get '/user/getid' => 'application#get_current_user_id'
-  get '/user/getname' => 'application#get_current_user_name'
+  get '/note/download/as_text' => 'notes#download_text'
+  get '/note/download/as_html' => 'notes#download_html'
+  get '/note/download/as_pdf' => 'notes#download_pdf'
+
+  get '/user/getid' => 'authenticated#get_current_user_id'
+  get '/user/getname' => 'authenticated#get_current_user_name'
+  
   get '/test' => 'application#test'
   post '/test/post' => 'application#test_post'
 end
