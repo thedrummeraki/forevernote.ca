@@ -6,17 +6,21 @@ Rails.application.routes.draw do
 
   get '/register' => 'application#register'
   post '/register' => 'application#do_register'
+  post '/user/update' => 'application#user_update'
 
   get '/editor' => 'application#editor'
   get '/get/note' => 'application#get_note'
   get '/get/notes' => 'application#get_notes'
   post '/save/note' => 'application#save_note'
+  delete '/delete/note' => 'application#delete_note'
   patch '/save/note/title' => 'application#save_note_title'
 
   get '/note/download/as_text' => 'application#download_text'
   get '/note/download/as_html' => 'application#download_html'
   get '/note/download/as_pdf' => 'application#download_pdf'
 
+  get '/user/getid' => 'application#get_current_user_id'
+  get '/user/getname' => 'application#get_current_user_name'
   get '/test' => 'application#test'
   post '/test/post' => 'application#test_post'
 end

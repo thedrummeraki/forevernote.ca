@@ -165,17 +165,28 @@
     <div id="modal_user_edit" class="modal modal-fixed-footer">
         <div class="modal-content">
             <div class="center">
-                <h4><%= current_user.get_name %></h4>
+                <h4 user-name-listener></h4>
             </div>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col s3">
                         <img class="responsive-img circle" src="https://www.gravatar.com/avatar/<%= current_user.get_email_hash + "?s=250" %>">
+                        <div class="center">
+                            <h5>About your profile picture</h5>
+                            <p>
+                                <b>Info: </b> You will <u>soon</u> be able to change your profile
+                                picture here. You can also do it directly on
+                                <a target="_blank" href="https://gravatar.com">Gravatar here</a>. Learn more about Gravatar
+                                <a target="_blank" href="https://gravatar.com/support/what-is-gravatar/">here</a> and check out their
+                                <a target="_blank" href="https://en.gravatar.com/support/">support page</a>
+                                too.
+                            </p>
+                        </div>
                     </div>
                     <div class="col s9">
                         <div class="row">
                             <div class="col s12 m12">
-                                <h6 id="profile-settings-explanation">Change your account information here</h6>
+                                <h5 id="profile-settings-explanation">Edit your profile info below</h5>
                             </div>
                         </div>
                         <div class="row thin-row">
@@ -193,11 +204,11 @@
                         <div class="row">
                             <div class="input-field col s12 m6">
                                 <i class="material-icons prefix">vpn_key</i>
-                                <input id="password" type="password" class="validate">
+                                <input id="password" type="password">
                                 <label data-error="This password is too short." for="password">Enter a new password</label>
                             </div>
                             <div class="input-field col s12 m6">
-                                <input id="cpassword" type="password" class="validate">
+                                <input id="cpassword" type="password">
                                 <label data-error="This password doesn't match the original password." for="cpassword">Confirm your new password</label>
                             </div>
                         </div>
@@ -219,6 +230,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="center">
                             <a href="#" id="save-profile" class="btn waves-effect waves-light">Save</a>
                         </div>
@@ -250,3 +262,4 @@
         });
     });
 </script>
+<script type="text/javascript" src="/js/save-user.js"></script>

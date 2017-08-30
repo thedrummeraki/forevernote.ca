@@ -6,6 +6,14 @@ class PdfConvert
     end
     WickedPdf.config = { exe_path: "#{Rails.root}/bin/wkhtmltopdf" }
 
+    def self.html(html)
+        result = "<html>"
+        result << "<head>"
+        result << "<head><meta charset='UTF-8'></html>"
+        result << html
+        result << "</html>"
+    end
+
     def self.to_pdf(note)
         p note
         title = note[:title] || "Untitled-#{note[:id]}"
@@ -17,6 +25,7 @@ class PdfConvert
           p e
         end
         filename = "forevernote-#{title}.pdf"
+        html = self.html html
         pdf = WickedPdf.new.pdf_from_string html
         {raw: pdf, filename: filename}
     end

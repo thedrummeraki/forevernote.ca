@@ -9,6 +9,11 @@ var Settings = (function() {
         4: {text: 'Saving note ({0}%)...', color: 'orange'},
         5: {text: 'Note saved!', color: 'green', timeout: 2000},
         6: {text: 'Last select note loaded!', color: 'green', timeout: 5000},
+        7: {text: 'Saving your user profile...', color: 'orange'},
+        8: {text: 'Your profile was saved!', color: 'green', timeout: 7000},
+        9: {text: 'Sorry, but we couldn\'t save your profile!', color: 'red'},
+        10: {text: 'Your note was successfully deleted.', color: 'green'},
+        11: {text: 'It seems this was already deleted!', color: 'orange'},
     };
     var default_settings = {
         "save-auto": false,
@@ -17,7 +22,7 @@ var Settings = (function() {
             time: 60,
         },
         "download-format": "html",
-        "theme-color": "default"
+        "theme-color": "blue"
     };
     var init = false;
     var settings = {};
@@ -75,29 +80,44 @@ var Settings = (function() {
         }
     }
 
+    var updateThemeColorFor = function(attribute, required_attr, old_color) {
+        var current_theme = getSetting('theme-color');
+        [].forEach.call(document.querySelectorAll('[' + required_attr + ']'), function(elem) {
+            if (old_color !== undefined && old_color) {
+                elem.classList.remove(old_color);
+            }
+            if (elem.hasAttribute(attribute)) {
+                elem.classList.add(current_theme);
+            } else {
+                elem.classList.remove(current_theme);
+            }
+            elem.classList.add('lighten-5');
+        });
+    }
+
     var setBackground = function(color) {
         if (color === undefined) {
-            console.log("hmm");
             var current_color = Settings.fetch('theme-color');
             if (current_color) {
                 setBackground(current_color);
             }
             return;
         }
-        console.log("settings background color: " + color)
         var nav_wrapper = document.getElementById("nav-wrapper");
         var note_mgmt_btn = document.getElementById("note-mgnt-btn");
         var elems = ["nav-wrapper", "note-mgnt-btn"];
+        var old_color = null;
         [].forEach.call(elems, function(elem_id) {
             var elem = document.getElementById(elem_id);
             if (elem) {
-                var old_color = elem.getAttribute("color");
+                old_color = elem.getAttribute("color");
                 elem.setAttribute('color', color);
                 _updateBackground(elem, old_color);
             } else {
                 console.warn("Can't update background of element %s (does not exist).", elem_id);
             }
         });
+        updateThemeColorFor('theme-color-listener', 'note-container', old_color);
     }
 
     var _updateBackground = function(elem, old_color) {
@@ -134,6 +154,7 @@ var Settings = (function() {
         is: checkBool,
         getDownloadURL: getDownloadURL,
         getStatus: getStatus,
+        updateThemeColorFor: updateThemeColorFor,
 
         STATUS_ERROR: "-1",
         STATUS_INIT: 0,
@@ -142,6 +163,11 @@ var Settings = (function() {
         STATUS_SETTINGS: 3,
         STATUS_SAVING: 4,
         STATUS_SAVED: 5,
-        STATUS_LAST_NOTE_LOADED: 6
+        STATUS_LAST_NOTE_LOADED: 6,
+        STATUS_PROFILE_SAVING: 7,
+        STATUS_PROFILE_SAVED: 8,
+        STATUS_PROFILE_SAVING_ERRORS: 9,
+        STATUS_DELETE_SUCCESS: 10,
+        STATUS_DELETE_FAILURE: 11,
     }
 })();

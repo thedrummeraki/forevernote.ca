@@ -89,6 +89,11 @@ class User < ApplicationRecord
         nil
     end
 
+    def delete_note(id)
+        success = self.notes.reject! {|n| n[:id] == id}
+        !success.nil? && self.save
+    end
+
     def find_notes keyword, options={}
         notes = []
         keys = [:id, :note, :title]

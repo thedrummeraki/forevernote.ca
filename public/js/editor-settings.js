@@ -32,7 +32,9 @@ $(document).ready(function() {
                 if (f.getAttribute("settings-value") === current) {
                     f.classList.add('active');
                     Settings.save('download-format', current);
-                    Materialize.toast("Selected download option: " + f.innerHTML, 3000, 'success-toast');
+                    var format = f.innerHTML;
+                    // document.getElementById('download-id').setAttribute('title', 'Download this note in ' + format.toUpperCase());
+                    Materialize.toast("Selected download option: " + format, 3000, 'success-toast');
                     return;
                 }
             });
