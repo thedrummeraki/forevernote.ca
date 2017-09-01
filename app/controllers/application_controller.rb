@@ -81,9 +81,10 @@ class ApplicationController < ActionController::Base
   end
 
   def test; end
+  def test_json; render json: {response: "This is my GET response."}; end
 
   def test_post
-    render json: {response: "This is my response."}
+    render json: {response: "This is my POST response."}
   end
 
 end

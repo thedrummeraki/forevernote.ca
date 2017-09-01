@@ -90,14 +90,6 @@ class User < ApplicationRecord
         self.save
     end
 
-    def get_note(id)
-        note = nil
-        self.get_notes.each do |n|
-            return n if n[:id] == id
-        end
-        nil
-    end
-
     def delete_note(id)
         success = self.notes.reject! {|n| n[:id] == id}
         !success.nil? && self.save
@@ -105,11 +97,12 @@ class User < ApplicationRecord
 
     def find_notes keyword, options={}
         notes = []
-        keys = [:id, :note, :title]
-        self.get_notes.each do |note|
+        keys = [:id, :contents, :title]
+        self.get_built_notes.each do |note|
             keys.each do |key|
                 value = note[key]
-                if key == :note
+                next if value.nil?
+                if key == :contents
                     value = Base64.decode64(value) if options[:b64]
                     value = URI.unescape(value) if options[:uri]
                 end
@@ -122,6 +115,25 @@ class User < ApplicationRecord
             end
         end
         notes
+    end
+
+    def get_note(id)
+        build_chunks id
+    end
+
+    def get_note_inst_by_id id
+        self.notes.each do |note|
+            return note if note[:id] == id
+        end
+        nil
+    end
+
+    def get_note_ids
+        ids = []
+        self.get_notes.each do |note|
+            ids.push note[:id]
+        end
+        ids
     end
 
     def get_notes
@@ -142,6 +154,14 @@ class User < ApplicationRecord
         #    res.push note
         #end
         #res
+    end
+
+    def get_built_notes
+        notes = []
+        self.get_note_ids.each do |note_id|
+            notes.push(get_note(note_id))
+        end
+        notes
     end
 
     def gen_id id=nil

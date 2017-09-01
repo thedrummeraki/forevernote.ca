@@ -1,5 +1,7 @@
 class NotesController < AuthenticatedController
 
+  include ChunksHelper  
+
   def request_id
     render json: current_user.create_note
   end
@@ -11,6 +13,24 @@ class NotesController < AuthenticatedController
     else
         render json: {success: false, message: "There is nothing to reject."}
     end
+  end
+
+  def save_chunk
+    contents = params[:chunk]
+    id = params[:note_id]
+    idx = params[:pos].to_i
+    quantity = params[:quantity].to_i
+    if idx < -1
+      render json: {success: false, message: "Invalid note index."}
+      return
+    end
+    done = save_tmp_chunk contents, id, idx, quantity
+    progress_value = (idx + 1) / quantity.to_f
+    progress_value = progress_value * 100
+    progress_value = progress_value.to_i
+    render json: {success: true, note_id: id, chunk: contents, tmp_chunks: tmp_chunks, progress_value: progress_value, done: done}
+    #new_id = current_user.save_chunk(contents, id, idx, true)
+    #render json: {success: !new_id.nil?, note_id: new_id, chunk: contents}
   end
 
   def save_note
@@ -26,8 +46,8 @@ class NotesController < AuthenticatedController
     end
       
     if idx == 0 || !is_chunks || is_first
-      # new_id = current_user.save_note(contents, id, true)
-      new_id = current_user.save_chunk(contents, id, idx, true)
+      new_id = current_user.save_note(contents, id, true)
+      # new_id = current_user.save_chunk(contents, id, idx, true)
       success = !new_id.nil?
     elsif is_chunks
       #current_user.with_lock do
@@ -64,7 +84,7 @@ class NotesController < AuthenticatedController
     if id
       note = current_user.get_note(id)
       if note
-        res = {success: true, contents: note[:note], title: note[:title]}
+        res = {success: true, contents: note[:contents], title: note[:title]}
       else
         res = {success: false, contents: nil}
       end
@@ -102,10 +122,10 @@ class NotesController < AuthenticatedController
           render json: {message: "Invalid URI escaped keyword."}; return
         end
       end
-      p "keyword: #{keyword}"
+      p "search keyword: #{keyword}"
       notes = current_user.find_notes keyword, {:b64 => is_b64 == "true", uri: is_uri == "true"}
     else
-      notes = current_user.get_notes
+      notes = current_user.get_built_notes
     end
     render json: {notes: notes}
   end

@@ -15,6 +15,7 @@ var Settings = (function() {
         10: {text: 'Your note was successfully deleted.', color: 'green'},
         11: {text: 'It seems this was already deleted!', color: 'orange'},
     };
+    const MY_CHUNK_SIZE = 1000;
     var default_settings = {
         "save-auto": false,
         "logout-after": {
@@ -155,6 +156,8 @@ var Settings = (function() {
         getDownloadURL: getDownloadURL,
         getStatus: getStatus,
         updateThemeColorFor: updateThemeColorFor,
+
+        CHUNK_SIZE: MY_CHUNK_SIZE,
 
         STATUS_ERROR: "-1",
         STATUS_INIT: 0,

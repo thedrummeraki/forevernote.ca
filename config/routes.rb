@@ -10,9 +10,12 @@ Rails.application.routes.draw do
 
   get '/editor' => 'authenticated#editor'
 
+  post '/create/note' => 'notes#request_id'
+  delete '/reject/note' => 'notes#reject_id'
   get '/get/note' => 'notes#get_note'
   get '/get/notes' => 'notes#get_notes'
   post '/save/note' => 'notes#save_note'
+  post '/send/chunk' => 'notes#save_chunk'
   delete '/delete/note' => 'notes#delete_note'
   patch '/save/note/title' => 'notes#save_note_title'
 
@@ -24,5 +27,6 @@ Rails.application.routes.draw do
   get '/user/getname' => 'authenticated#get_current_user_name'
 
   get '/test' => 'application#test'
+  get '/test/json' => 'application#test_json'
   post '/test/post' => 'application#test_post'
 end

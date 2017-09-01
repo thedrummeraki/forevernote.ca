@@ -266,45 +266,49 @@
             }
           });
         }
-        function saveNote(n, hide_notification) {
-          if (n !== undefined) {
-            if (n < 0) {
-              saveNoteTitle(function() {
-                total_size = null;
-                if (!hide_notification) {
-                  setProgress(null);
-                  // Materialize.toast("Note successfully saved!", 2000, "success-toast");
-                  setStatus(Settings.STATUS_SAVED);
-                }
-                console.log("Note successfully saved!");
-              });
-              return;
+
+        function sendChunk(chunk_obj, quantity) {
+          $.ajax({
+            url: '/send/chunk?quantity=' + quantity + '&chunk=' + chunk_obj.chunk + '&pos=' + chunk_obj.pos + '&note_id=' + current_note,
+            method: 'post',
+            async: false,
+            success: function(e) {
+              console.log(e.chunk == chunk_obj.chunk);
+              if (e.done) {
+                console.log("All chunks were sent.");
+                setStatus(Settings.STATUS_SAVED);
+              } else {
+                setStatus(Settings.STATUS_SAVING, e.progress_value);
+              }
+            },
+            error: function(a, b, c) {
+              console.error("Error for chunk n#%d", chunk_obj.pos);
+              console.error(a);
+              console.error(b);
+              console.error(c);
             }
-          }
-          var progress_value = 1 - (n / total_size) || 0;
-          progress_value *= 100;
-          progress_value = parseInt(progress_value);
-          console.log(progress_value);
-          setStatus(Settings.STATUS_SAVING, progress_value);
-          
+          });
+        }
+        function sendChunks(chunks) {
+          [].forEach.call(chunks, function(chunk, i) {
+            sendChunk({chunk: chunk, pos: i, note_id: current_note}, chunks.length);
+          });
+        }
+
+        function saveNote(hide_notification) {
+          setStatus(Settings.STATUS_SAVING);
           if (!hide_notification) {
-            setProgress(progress_value);
+           setProgress(0);
           }
 
           var new_content = $('#editor-container > .ql-editor').html();
-          var length = new_content.length;
           new_content = safeEncode(new_content);
-          new_content = convertStringToArray(new_content, 1000);
+          var length = new_content.length;
+          console.log(new_content);
+          new_content = convertStringToArray(new_content, Settings.CHUNK_SIZE);
           console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
-          var first = false;
-          if (n === undefined) {
-            n = new_content.length - 1;
-            first = true;
-            total_size = n + 1;
-          }
-          var index = new_content.length - n - 1;
-          var chunk_to_send = new_content[index];
-          sendNote(chunk_to_send, n, new_content.length, first);
+
+          sendChunks(new_content);
         }
         $(document).keydown(function(e) {
             var key = undefined;
@@ -512,8 +516,7 @@
               e.preventDefault();
             }
             hideCurrentNote(e);
-            showNewEditor();
-            showNoteOptions();
+            showNewEditor(showNoteOptions);
           }
         }
 
@@ -550,6 +553,9 @@
               if (e.notes) {
                 var notes = "";
                 [].forEach.call(e.notes, function(note) {
+                  if (note == null) {
+                    return;
+                  }
                   notes += buildNote(note);
                 });
                 cont.innerHTML = notes;
@@ -573,20 +579,29 @@
           document.getElementById('editor-container').focus();
         }
 
-        function showNewEditor() {
+        function showNewEditor(callback) {
           setLoading(true);
-          current_note = true;
-          editor_cont.classList.remove("hide");
-          hideInitMessage(note_listeners);
-          note_mgmt_icon.innerHTML = "save";
-          note_mgmt_btn.setAttribute("state", "creating");
-          note_mgmt_btn.setAttribute('title', 'Save this new note!');
-          setLoading(false);
-          Settings.clear('last-selected-note');
+          $.ajax({
+            url: '/create/note',
+            method: 'post',
+            success: function(e) {
+              current_note = e.new_id;
+              editor_cont.classList.remove("hide");
+              hideInitMessage(note_listeners);
+              note_mgmt_icon.innerHTML = "save";
+              note_mgmt_btn.setAttribute("state", "creating");
+              note_mgmt_btn.setAttribute('title', 'Save this new note!');
+              setLoading(false);
+              Settings.clear('last-selected-note');
 
-          var title_input = document.getElementById('note-title-value');
-          title_input.value = "";
-          title_input.focus();
+              var title_input = document.getElementById('note-title-value');
+              title_input.value = "";
+              title_input.focus();
+              if (callback) {
+                callback();
+              }
+            }
+          });
         }
 
         var toolbarOptions = [
