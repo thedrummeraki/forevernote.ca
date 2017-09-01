@@ -16,18 +16,24 @@ class NotesController < AuthenticatedController
   end
 
   def save_chunk
-    contents = params[:chunk]
+    title = params[:title]
     id = params[:note_id]
-    idx = params[:pos].to_i
-    quantity = params[:quantity].to_i
-    if idx < -1
-      render json: {success: false, message: "Invalid note index."}
-      return
+    unless title
+        contents = params[:chunk]
+        idx = params[:pos].to_i
+        quantity = params[:quantity].to_i
+        if idx < -1
+          render json: {success: false, message: "Invalid note index."}
+          return
+        end
+        done = save_tmp_chunk contents, id, idx, quantity
+        progress_value = (idx + 1) / quantity.to_f
+        progress_value = progress_value * 100
+        progress_value = progress_value.to_i
+    else
+        progress_value = nil
+        done = save_tmp_chunk_title title, id
     end
-    done = save_tmp_chunk contents, id, idx, quantity
-    progress_value = (idx + 1) / quantity.to_f
-    progress_value = progress_value * 100
-    progress_value = progress_value.to_i
     render json: {success: true, note_id: id, chunk: contents, tmp_chunks: tmp_chunks, progress_value: progress_value, done: done}
     #new_id = current_user.save_chunk(contents, id, idx, true)
     #render json: {success: !new_id.nil?, note_id: new_id, chunk: contents}

@@ -4,7 +4,7 @@ module ChunksHelper
 
     class ChunksManager
         include Singleton
-        attr_accessor :tmp_chunks
+        attr_accessor :tmp_chunks, :tmp_title
         def save_tmp_chunk text, id, idx, quantity, current_user
             unless @tmp_chunks
                 @tmp_chunks = []
@@ -15,8 +15,12 @@ module ChunksHelper
             return false
         end
 
-        def tmp_chunks
-            @tmp_chunks
+        def save_tmp_chunk_title title, id
+            unless @tmp_title
+                @tmp_title = {}
+            end
+            @tmp_title[:title] = title
+            @tmp_title[:note_id] = id
         end
 
         def save_and_clean current_user, id
@@ -25,7 +29,12 @@ module ChunksHelper
                 raise Exception.new "This note does not exist."
             end
             note[:chunks] = tmp_chunks
+            if tmp_title[:note_id] == id
+                p "Title: #{tmp_title[:title]}"
+                note[:title] = tmp_title[:title]
+            end
             @tmp_chunks = []
+            @tmp_title = nil
 
             pos = current_user.get_note_pos id
             unless pos < 0
@@ -39,10 +48,22 @@ module ChunksHelper
             end
             save_ok
         end
+
+        def tmp_chunks
+            @tmp_chunks
+        end
+
+        def tmp_title
+            @tmp_title
+        end
     end
 
     def save_tmp_chunk text, id, idx, quantity
         ChunksManager.instance.save_tmp_chunk(text, id, idx, quantity, current_user)
+    end
+
+    def save_tmp_chunk_title title, id
+        ChunksManager.instance.save_tmp_chunk_title(title, id)
     end
 
     def tmp_chunks

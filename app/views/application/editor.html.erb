@@ -267,6 +267,16 @@
           });
         }
 
+        function sendTitle(title_obj) {
+          $.ajax({
+            url: '/send/chunk?title=true&title=' + title_obj.title + '&note_id=' + title_obj.note_id,
+            method: 'post',
+            async: false,
+            success: function(e) {
+              console.log(e.message);
+            }
+          });
+        }
         function sendChunk(chunk_obj, quantity) {
           $.ajax({
             url: '/send/chunk?quantity=' + quantity + '&chunk=' + chunk_obj.chunk + '&pos=' + chunk_obj.pos + '&note_id=' + current_note,
@@ -277,6 +287,7 @@
               if (e.done) {
                 console.log("All chunks were sent.");
                 setStatus(Settings.STATUS_SAVED);
+                getNotes();
               } else {
                 setStatus(Settings.STATUS_SAVING, e.progress_value);
               }
@@ -290,6 +301,11 @@
           });
         }
         function sendChunks(chunks) {
+          var note_title = document.getElementById('note-title-value');
+          note_title = note_title.value.trim();
+          if (note_title) {
+            sendTitle({note_id: current_note, title: note_title});
+          }
           [].forEach.call(chunks, function(chunk, i) {
             sendChunk({chunk: chunk, pos: i, note_id: current_note}, chunks.length);
           });
@@ -523,10 +539,10 @@
         function buildNote(note) {
           id = note.id;
           title = note.title || "- Untitled -";
-          note = extractContent(note.note);
+          note = extractContent(note.contents);
           note = safeDecode(note, true);
-          if (note.length > 30) {
-            note = note.substring(0, 30) + "<i>[...]</i>";
+          if (note.length > 25) {
+            note = note.substring(0, 25) + "<i>[...]</i>";
           } else if (note.trim().length == 0) {
             note = "<i>Empty</i>";
           }
