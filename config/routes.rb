@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   get '/logout' => 'users#logout'
 
   get '/register' => 'application#register'
+  get '/registered' => 'application#registered'
+  get '/success' => 'application#success'
+  get '/activate/:username' => 'application#activate'
+  patch '/activate/:hash/' => 'application#finalize_activation'
   post '/register' => 'application#do_register'
   post '/user/update' => 'users#user_update'
 

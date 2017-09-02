@@ -1,0 +1,9 @@
+<script type="text/javascript">
+    $.ajax({
+        url: '/activate/<%= @hash %>',
+        method: 'patch',
+        success: function(e) {
+            window.location.href = e.url;
+        }
+    });
+</script>

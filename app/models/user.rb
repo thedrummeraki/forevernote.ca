@@ -168,5 +168,28 @@ class User < ApplicationRecord
         id || OpenSSL::Digest::SHA256.new(Time.now.to_s).to_s
     end
 
+    def register
+        return false if is_registered?
+        self.registration_hash = self.username.to_s + self.email_address.to_s + Time.now.to_s
+        self.registration_hash = OpenSSL::Digest::SHA256.new(self.registration_hash)
+        self.is_activated = false
+        EmailSender.send_registration_email self
+        save
+    end
+
+    def set_activated
+        return true if self.is_registered?
+        self.is_activated = true
+        save
+    end
+
+    def is_registered?
+        is_activated? && !self.registration_hash.nil?
+    end
+
+    def is_activated?
+        !self.is_activated.nil? && self.is_activated == true
+    end
+
     has_secure_password
 end
