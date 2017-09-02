@@ -7,6 +7,11 @@
       }
     </style>
     <nav>
+      <ul id='download-dropdown' class='dropdown-content'>
+        <li><a direct-download="html">as HTML</a></li>
+        <li><a direct-download="pdf">as PDF</a></li>
+        <li><a direct-download="text">as Text</a></li>
+      </ul>
       <div id="nav-wrapper" class="nav-wrapper">
         <a href="/" class="brand-logo">ForeverNote</a>
         <a href="#" data-activates="nav-mobile" class="button-collapse top-nav waves-effect waves-light circle hide-on-large-only">
@@ -15,7 +20,7 @@
         <ul class="right hide-on-med-and-down">
           <li note-option note-listener class="hide"><a title="Add a new node" href="#" id="add-note"><i class="material-icons">fiber_new</i></a></li>
           <li note-option note-listener class="hide"><a title="Close this note" href="#" id="close-note"><i class="material-icons">close</i></a></li>
-          <li id="download-li" note-option="download" note-listener class="hide"><a href="#"><i class="material-icons">file_download</i></a></li>
+          <li id="download-li" note-option="" note-listener class="hide dropdown-button" data-activates="download-dropdown"><a href="#"><i class="material-icons">file_download</i></a></li>
           <li title="Delete this note" note-option="delete" note-listener class="hide"><a href="#"><i class="material-icons">delete</i></a></li>
           <li><a title="Application settings" href="#settings"><i class="material-icons">settings</i></a></li>
           <li class="hide"><a title="Need some help?" href="#help"><i class="material-icons">help</i></a></li>
@@ -127,6 +132,7 @@
         checkAndSetupSaveAutoSettings();
         setupSearchBar();
         updateUserName();
+        setDownloadURLs();
 
         function setProgress(value) {
           return;
@@ -187,6 +193,18 @@
               setTimeout(function() {
                 setStatus(Settings.STATUS_INIT);
               }, status.timeout);
+            }
+          });
+        }
+
+        function setDownloadURLs() {
+          var direct_downloads = document.querySelectorAll("[direct-download]");
+          [].forEach.call(direct_downloads, function(dd) {
+            dd.onclick = function(e) {
+              console.log("click")
+              e.preventDefault();
+              var format = dd.getAttribute('direct-download');
+              window.open(Settings.getDownloadURL(format).concat('?note_id=' + current_note));
             }
           });
         }

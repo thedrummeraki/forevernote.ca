@@ -141,15 +141,16 @@ class NotesController < AuthenticatedController
     if id
       note = current_user.get_note(id)
       if note
-        note_text = note[:note]
+        note_text = note[:contents]
         begin
           note_text = Base64.decode64(note_text)
           note_text = URI.unescape note_text
         rescue Exception => e
           p e
         end
-        note_text = "<html><link href='https://cdn.quilljs.com/1.0.0/quill.snow.css' rel='stylesheet'><body><div class='ql-editor'>#{note_text}</div></body></html>"
-        note_text = Nokogiri::HTML(note_text).to_s
+        note[:contents] = note_text
+        note_text = PdfConvert.build_html note, current_user
+        # note_text = Nokogiri::HTML(note_text).to_s
         title = note[:title] || "Untitled-#{note[:id]}"
         send_data note_text, filename: "forevernote-#{title}.html"
       else
@@ -166,7 +167,15 @@ class NotesController < AuthenticatedController
       note = current_user.get_note(id)
       if note
         res = {success: true}
-        note_text = note[:note].gsub("<br>", "\n")
+        note_text = note[:contents]
+        begin
+          note_text = Base64.decode64(note_text)
+          note_text = URI.unescape note_text
+        rescue Exception => e
+          render json: {success: false, message: "Invalid b64 or html data.", expection: e.to_s}
+          return
+        end
+        note_text = note_text.gsub("<br>", "\n")
         note_text = note_text.gsub("<br/>", "\n")
         note_text = Nokogiri::HTML(note_text).text
         title = note[:title] || "Untitled-#{note[:id]}"
@@ -184,8 +193,17 @@ class NotesController < AuthenticatedController
     id = params[:note_id]
     if id
       note = current_user.get_note(id)
+      p note
       if note
-        res = PdfConvert.to_pdf(note)
+        note_text = note[:contents]
+        begin
+          note_text = Base64.decode64(note_text)
+          note_text = URI.unescape note_text
+        rescue Exception => e
+          p e
+        end
+        note[:contents] = note_text
+        res = PdfConvert.to_pdf(note, current_user)
         send_data res[:raw], filename: res[:filename], disposition: "inline", type: "application/pdf"
       else
         render json: {success: false, url: nil}

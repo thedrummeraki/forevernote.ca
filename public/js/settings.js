@@ -39,8 +39,10 @@ var Settings = (function() {
         _save();
     }
 
-    var getDownloadURL = function() {
-        var format = getSetting('download-format');
+    var getDownloadURL = function(format) {
+        if (format === undefined) {
+            format = getSetting('download-format');
+        }
         console.log(format);
         if (format == "text") {
             return "/note/download/as_text";
