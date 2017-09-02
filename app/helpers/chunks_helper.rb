@@ -29,8 +29,9 @@ module ChunksHelper
                 raise Exception.new "This note does not exist."
             end
             note[:chunks] = tmp_chunks
-            if tmp_title[:note_id] == id
-                p "Title: #{tmp_title[:title]}"
+            if tmp_title.nil?
+                note[:title] = nil
+            elsif tmp_title[:note_id] == id
                 note[:title] = tmp_title[:title]
             end
             @tmp_chunks = []

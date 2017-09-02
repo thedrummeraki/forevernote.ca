@@ -28,6 +28,10 @@ var Settings = (function() {
     var init = false;
     var settings = {};
 
+    var getJSON = function() {
+        return settings;
+    }
+
     var setSetting = function(key, value) {
         settings[key] = value;
         _save();
@@ -158,6 +162,7 @@ var Settings = (function() {
         getDownloadURL: getDownloadURL,
         getStatus: getStatus,
         updateThemeColorFor: updateThemeColorFor,
+        toJSON: getJSON,
 
         CHUNK_SIZE: MY_CHUNK_SIZE,
 
