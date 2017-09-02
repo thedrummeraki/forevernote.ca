@@ -92,7 +92,7 @@ class ApplicationController < ActionController::Base
   end
 
   def activate
-    user = User.find_by username: params[:username]
+    user = User.find_by registration_hash: params[:hash]
     if user
       p "Found username #{user.username}"
       @hash = user.registration_hash
@@ -108,7 +108,7 @@ class ApplicationController < ActionController::Base
     if user
       p "Setting activated #{user.is_activated?}"
       user.set_activated
-      url = '/success?username=' + user.username
+      url = '/success'
     else
       url = '/errors?message=This username ' + params[:username] + ' was not found!'
     end

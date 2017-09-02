@@ -178,13 +178,13 @@ class User < ApplicationRecord
     end
 
     def set_activated
-        return true if self.is_registered?
+        return true if self.is_activated?
         self.is_activated = true
         save
     end
 
     def is_registered?
-        is_activated? && !self.registration_hash.nil?
+        is_activated? || !self.registration_hash.nil?
     end
 
     def is_activated?

@@ -29,7 +29,7 @@ class EmailSender
     end
 
     def self.send_registration_email user
-      activation_link = 'https://www.forevernote.ca/activate/' + user.username
+      activation_link = 'https://www.forevernote.ca/activate/' + user.registration_hash
       html = [
         '<h2>Welcome to ForeverNote!</h2>',
         '<p>',

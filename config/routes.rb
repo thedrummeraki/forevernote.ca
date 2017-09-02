@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   get '/register' => 'application#register'
   get '/registered' => 'application#registered'
   get '/success' => 'application#success'
-  get '/activate/:username' => 'application#activate'
+  get '/activate/:hash' => 'application#activate'
   patch '/activate/:hash/' => 'application#finalize_activation'
   post '/register' => 'application#do_register'
   post '/user/update' => 'users#user_update'
