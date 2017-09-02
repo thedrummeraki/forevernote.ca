@@ -33,6 +33,7 @@ gem 'bcrypt', '~> 3.1.7'
 # PDFKit gem (wkhtmltopdf in "/bin" folder)
 gem 'pdfkit'
 gem 'wicked_pdf'
+gem 'mail'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
