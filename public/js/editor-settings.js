@@ -1,10 +1,6 @@
 $(document).ready(function() {
 
     (function() {
-      
-    })();
-
-    (function() {
       var settings_listeners = document.querySelectorAll("[settings-listener]");
       [].forEach.call(settings_listeners, function(sl) {
         if (sl.hasAttribute('settings-switch')) {

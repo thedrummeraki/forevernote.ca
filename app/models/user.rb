@@ -90,9 +90,10 @@ class User < ApplicationRecord
         self.save
     end
 
-    def delete_note(id)
+    def delete_note(id, do_save=true)
         success = self.notes.reject! {|n| n[:id] == id}
-        !success.nil? && self.save
+        save if do_save
+        !success.nil?
     end
 
     def find_notes keyword, options={}
@@ -156,11 +157,16 @@ class User < ApplicationRecord
         #res
     end
 
-    def get_built_notes
+    def get_built_notes clean_up_empty=false
         notes = []
         self.get_note_ids.each do |note_id|
+            if is_empty_note note_id
+                delete_note note_id, false
+                next
+            end
             notes.push(get_note(note_id))
         end
+        save if clean_up_empty
         notes
     end
 

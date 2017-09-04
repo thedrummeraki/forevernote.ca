@@ -31,7 +31,7 @@ $(document).ready(function() {
     setDownloadURLs();
 
     function focusAtEndQuill() {
-        editor.setSelection(0, 1);
+        //editor.setSelection(0, 1);
     }
 
     function setProgress(value) {
@@ -56,7 +56,7 @@ $(document).ready(function() {
             success: function(e) {
               if (e.success) {
                 hideCurrentNote();
-                getNotes();
+                getNotes(null, false, refreshNoteContainers);
                 setStatus(Settings.STATUS_DELETE_SUCCESS, null, true);
               } else {
                 setStatus(Settings.STATUS_DELETE_FAILURE);
@@ -157,35 +157,6 @@ $(document).ready(function() {
         }
       });
     }
-    function sendNote(chunck, n, size, is_first) {
-      var url = '/save/note?chunks=true&i=' + (size-n) + '&content=' + chunck + '&is_first=' + is_first;
-      if (current_note && current_note != true) {
-        url = url.concat('&note_id=' + current_note);
-      }
-      // console.log("Chunk (%d bytes):", chunck.length)
-      // console.log(chunck);
-      // console.log("sending at url: " + url);
-      $.ajax({
-        url: url,
-        method: 'post',
-        async: true,
-        success: function(e) {
-          console.log("Got part response (%d): ", n);
-          console.log(e);
-          if (e.success) {
-            saveNote(n-1);
-            if (e.new_id) {
-              current_note = e.new_id;
-            }
-            getNotes();
-          }
-        },
-        error: function(e) {
-          setStatus(Settings.STATUS_ERROR);
-          return;
-        }
-      });
-    }
 
     function sendTitle(title_obj) {
       $.ajax({
@@ -229,7 +200,7 @@ $(document).ready(function() {
       [].forEach.call(chunks, function(chunk, i) {
         sendChunk({chunk: chunk, pos: i, note_id: current_note}, chunks.length);
       });
-      if (callback !== undefined) {
+      if (typeof callback === 'function') {
         callback();
       }
     }
@@ -279,7 +250,7 @@ $(document).ready(function() {
       search_input.onkeyup = function(e) {
         var keyword = this.value;
         var note_containers = [];
-        getNotes(keyword, function(note_containers) {
+        getNotes(keyword, false, function(note_containers) {
           [].forEach.call(note_containers, function(nc) {
             nc.onclick = showNote;
           });
@@ -289,19 +260,32 @@ $(document).ready(function() {
 
     function checkAndSetupSaveAutoSettings() {
       var editor_cont = document.getElementById('editor-container');
+      var note_title_input = document.getElementById('note-title-value');
+
       var typing_timer;
-      var done_typing_timeout = 1000;
+      var editor_done_typing_timeout = 1000;
+      var input_done_typing_timeout = 0;
+
       editor_cont.onkeyup = function(e) {
         clearTimeout(typing_timer);
-        typing_timer = setTimeout(done_typing, done_typing_timeout);
+        typing_timer = setTimeout(done_typing, editor_done_typing_timeout);
       }
-      editor_cont.onkeydown = function(e) {
+      note_title_input.onkeyup = function(e) {
+        clearTimeout(typing_timer);
+        typing_timer = setTimeout(done_typing, input_done_typing_timeout); 
+      }
+
+      var saveNoteEvent = function(e) {
         var is_not_typing_key = e.ctrlKey || e.shiftKey || e.altKey || (e.keyCode > 36 && e.keyCode < 41);
         if (!is_not_typing_key) {
           setStatus(Settings.STATUS_WRITING);
         }
         clearTimeout(typing_timer);
       }
+      
+      editor_cont.onkeydown = saveNoteEvent;
+      note_title_input.onkeydown = saveNoteEvent;
+
       var done_typing = function() {
         setStatus(Settings.STATUS_INIT);
         if (Settings.is('save-auto')) {
@@ -361,6 +345,13 @@ $(document).ready(function() {
         showNote(null, last_selected_note);
         // setStatus(Settings.STATUS_LAST_NOTE_LOADED);
       }
+    }
+
+    function highlightSelectedNote() {
+      if (!current_note) {
+        console.warn('No selected note.'); return;
+      }
+      setSelectedNote(current_note);
     }
 
     function setSelectedNote(id) {
@@ -497,6 +488,11 @@ $(document).ready(function() {
                 var container = document.querySelector('[note-container="' + id + '"]');
                 if (res.success && container) {
                     var contents = res.contents;
+                    var title = res.title;
+                    if (!title) {
+                      title = "- Untitled -"
+                    }
+
                     contents = extractContent(contents);
                     contents = safeDecode(contents, true);
                     if (contents.length > 25) {
@@ -509,7 +505,7 @@ $(document).ready(function() {
                     var conts_sub_cont = sub_container.children[1];
 
                     console.log(contents);
-                    title_sub_cont.innerHTML = res.title;
+                    title_sub_cont.innerHTML = title;
                     conts_sub_cont.innerHTML = contents;
                 } else if (!container) {
                     console.error("No container for id " + id);
@@ -518,7 +514,31 @@ $(document).ready(function() {
         });
     }
 
-    function getNotes(keyword, callback) {
+    function refreshNoteContainers() {
+      var note_containers = document.querySelectorAll("[note-container]");
+      [].forEach.call(note_containers, function(nc) {
+        nc.onclick = showNote;
+      });
+    }
+
+    function addNote(id) {
+      $.ajax({
+        url: '/get/note?note_id=' + id,
+        success: function(e) {
+          if (!e.success) {
+            console.warn("This note %s might not exist anymore.", id); return;
+          }
+          note = {id: id, contents: e.contents, title: e.title};
+          note = buildNote(note);
+          var cont = document.getElementById("notes-list-side");
+          cont.innerHTML += note;
+          refreshNoteContainers();
+          setSelectedNote(id);
+        }
+      });
+    }
+
+    function getNotes(keyword, showLastSelectedNote, callback) {
       var cont = document.getElementById("notes-list-side");
       var url = '/get/notes';
       if (keyword) {
@@ -537,7 +557,11 @@ $(document).ready(function() {
               notes += buildNote(note);
             });
             cont.innerHTML = notes;
-            checkLastSelectedNote();
+            if (showLastSelectedNote !== undefined && showLastSelectedNote) {
+              checkLastSelectedNote();
+            } else {
+              highlightSelectedNote();
+            }
             if (current_note) {
               setSelectedNote(current_note);
             }
@@ -578,7 +602,10 @@ $(document).ready(function() {
           var title_input = document.getElementById('note-title-value');
           title_input.value = "";
           title_input.focus();
+          addNote(current_note);
+          console.log("note added!");
           if (callback) {
+            console.log("Running callback");
             callback();
           }
         }
@@ -587,22 +614,22 @@ $(document).ready(function() {
 
     var toolbarOptions = [
       ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-      ['blockquote', 'code-block'],
+      //['blockquote', 'code-block'],
 
       [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+      [/* { 'list': 'ordered'},  */{ 'list': 'bullet' }],
+      //[{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
       [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-      [{ 'direction': 'rtl' }],                         // text direction
+      ['image', 'formula'],                         // text direction
 
       [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      //[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
 
       [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
       [{ 'font': [] }],
       [{ 'align': [] }],
 
-      ['clean']                                         // remove formatting button
+      //['clean']                                         // remove formatting button
     ];
 
     var options = {
@@ -616,7 +643,7 @@ $(document).ready(function() {
 
     var editor_cont = document.getElementById("editor");
     var note_containers = [];
-    getNotes(null, function(note_containers) {
+    getNotes(null, false, function(note_containers) {
       first_message.innerHTML = "- Please select a note on the side or click on the button below to create a new note -";
       [].forEach.call(note_containers, function(nc) {
         nc.onclick = showNote;
@@ -655,8 +682,7 @@ $(document).ready(function() {
         console.log("shift key + tab")
       }
     }
-    title_input.onkeyup = titleInputToEditor;
-    title_input.onkeydown = titleInputToEditor;
+    // title_input.onkeyup = titleInputToEditor;
     ql_editor.onkeyup = editorToTitleInput;
     ql_editor.onkeydown = editorToTitleInput;
 });

@@ -33,6 +33,8 @@ gem 'bcrypt', '~> 3.1.7'
 # PDFKit gem (wkhtmltopdf in "/bin" folder)
 gem 'pdfkit'
 gem 'wicked_pdf'
+
+# Email gem to send emails
 gem 'mail'
 
 # Use Capistrano for deployment

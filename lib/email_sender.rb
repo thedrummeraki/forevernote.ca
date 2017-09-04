@@ -13,6 +13,8 @@ class EmailSender
       opts[:enable_starttls_auto] ||= true
       opts[:subject] ||= 'ForeverNote Notification'
 
+      raise Exception.new("Please specify a non-empty email body (plain text or HTML).") if opts[:body].to_s.strip.empty?
+
       Mail.defaults do
         delivery_method :smtp, opts
       end
