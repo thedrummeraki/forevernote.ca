@@ -26,6 +26,7 @@ $(document).ready(function() {
     Settings.background();
     setStatus(Settings.STATUS_INIT);
     checkAndSetupSaveAutoSettings();
+    checkLastSelectedNote();
     setupSearchBar();
     updateUserName();
     setDownloadURLs();

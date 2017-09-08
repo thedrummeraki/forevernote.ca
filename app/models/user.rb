@@ -115,7 +115,8 @@ class User < ApplicationRecord
                 end
             end
         end
-        notes
+        notes.index_by {|r| r[:id]}.values
+        #notes
     end
 
     def get_note(id)
