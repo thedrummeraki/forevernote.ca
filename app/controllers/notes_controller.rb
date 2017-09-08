@@ -27,7 +27,6 @@ class NotesController < AuthenticatedController
           return
         end
         done = save_tmp_chunk contents, id, idx, quantity
-        sleep(5) if done
         progress_value = (idx + 1) / quantity.to_f
         progress_value = progress_value * 100
         progress_value = progress_value.to_i
