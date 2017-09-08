@@ -18,13 +18,13 @@
             <i class="material-icons">menu</i>
         </a>
         <ul class="right hide-on-med-and-down">
-          <li note-option note-listener class="hide"><a title="Add a new node" href="#" id="add-note"><i class="material-icons">fiber_new</i></a></li>
-          <li note-option note-listener class="hide"><a title="Close this note" href="#" id="close-note"><i class="material-icons">close</i></a></li>
-          <li id="download-li" note-option="" note-listener class="hide dropdown-button" data-activates="download-dropdown"><a href="#"><i class="material-icons">file_download</i></a></li>
-          <li title="Delete this note" note-option="delete" note-listener class="hide"><a href="#"><i class="material-icons">delete</i></a></li>
+          <li note-option note-listener class="hide"><a disable-on="note-save" title="Add a new node" href="#" id="add-note"><i class="material-icons">fiber_new</i></a></li>
+          <li note-option note-listener class="hide"><a disable-on="note-save" title="Close this note" href="#" id="close-note"><i class="material-icons">close</i></a></li>
+          <li id="download-li" note-option="" note-listener class="hide dropdown-button" data-activates="download-dropdown"><a disable-on="note-save" href="#"><i class="material-icons">file_download</i></a></li>
+          <li title="Delete this note" note-option="delete" note-listener class="hide"><a disable-on="note-save" href="#"><i class="material-icons">delete</i></a></li>
           <li><a title="Application settings" href="#settings"><i class="material-icons">settings</i></a></li>
           <li class="hide"><a title="Need some help?" href="#help"><i class="material-icons">help</i></a></li>
-          <li><a title="Logout" href="/logout"><i class="material-icons">exit_to_app</i></a></li>
+          <li><a disable-on="note-save" title="Logout" href="/logout"><i class="material-icons">exit_to_app</i></a></li>
         </ul>
       </div>
     </nav>
@@ -64,7 +64,7 @@
       <%= render 'shared/modals' %>
     </div>
     <div class="fixed-action-btn">
-        <a title="Create a new note" state="new" id="note-mgnt-btn" class="btn-floating btn-large red">
+        <a disable-on="note-save" title="Create a new note" state="new" id="note-mgnt-btn" class="btn-floating btn-large red">
           <i class="large material-icons" id="note-mgnt-icon">mode_edit</i>
         </a>
         <ul class="hide">

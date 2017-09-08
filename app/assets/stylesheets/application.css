@@ -105,6 +105,15 @@ a {
     font-size: 20px;
 }
 
+a.busy {
+    pointer-events: none !important;
+    cursor: default !important;
+}
+
+a.busy .material-icons {
+  color: #bcb;
+}
+
 li.search .search-wrapper input#search {
     display: block;
     font-size: 16px;

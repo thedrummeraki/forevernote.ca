@@ -27,6 +27,7 @@ class NotesController < AuthenticatedController
           return
         end
         done = save_tmp_chunk contents, id, idx, quantity
+        sleep(5) if done
         progress_value = (idx + 1) / quantity.to_f
         progress_value = progress_value * 100
         progress_value = progress_value.to_i
@@ -149,7 +150,7 @@ class NotesController < AuthenticatedController
           p e
         end
         note[:contents] = note_text
-        note_text = PdfConvert.build_html note, current_user
+        note_text = PdfConvert.build_html :html, note, current_user
         # note_text = Nokogiri::HTML(note_text).to_s
         title = note[:title] || "Untitled-#{note[:id]}"
         send_data note_text, filename: "forevernote-#{title}.html"

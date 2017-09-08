@@ -1,7 +1,10 @@
 class PdfConvert
 
+    NO_MARGIN = {bottom: 0, top: 0, left: 0, right: 0}
+
     HTML_TEMPLATE_FOLDER = Rails.root + "html_samples/"
-    HTML_TEMPLATE_01 = HTML_TEMPLATE_FOLDER + "sample_1.html"
+    HTML_TEMPLATE_01 = HTML_TEMPLATE_FOLDER + "sample_html_1.html"
+    PDF_HTML_TEMPLATE_01 = HTML_TEMPLATE_FOLDER + "sample_pdf_1.html"
 
     BIN_LOCATION = Rails.root + "bin/wkhtmltopdf"
     PDFKit.configure do |config|
@@ -20,19 +23,29 @@ class PdfConvert
     def self.to_pdf note, current_user
         title = note[:title] || "Untitled-#{note[:id]}"
         filename = "forevernote-#{title}.pdf"
-        html = self.build_html note, current_user
-        pdf = WickedPdf.new.pdf_from_string html
+        html = self.build_html :pdf, note, current_user
+        pdf = WickedPdf.new.pdf_from_string html, margin: NO_MARGIN, padding: {top: 10}
         {raw: pdf, filename: filename}
     end
 
-    def self.build_html note, current_user
+    def self.build_default_html note, current_user
+        self.build_html :html, note, current_user
+    end
+
+    def self.build_pdf_html node, current_user
+        self.build_html :pdf, note, current_user
+    end
+
+    def self.build_html type, note, current_user
         title = note[:title] || "Untitled note"
         contents = Nokogiri::HTML::DocumentFragment.parse note[:contents]
         id = note[:id]
         date = Time.now.to_s
         username = current_user.get_name
 
-        template_html = File.read HTML_TEMPLATE_01
+        filename = get_filename type
+        return nil if filename.nil?
+        template_html = File.read filename
         template_html = Nokogiri::HTML(template_html)
         p "first"
         template_html.traverse do |elem|
@@ -56,5 +69,11 @@ class PdfConvert
         end
         template_html.to_s.gsub('\n', '')
     end
+
+    private
+        def self.get_filename type
+            return HTML_TEMPLATE_01 if type == :html
+            return PDF_HTML_TEMPLATE_01 if type == :pdf
+        end
 
 end

@@ -178,6 +178,7 @@ $(document).ready(function() {
           if (e.done) {
             console.log("All chunks were sent.");
             setStatus(Settings.STATUS_SAVED);
+            enableOnEnd("note-save");
             updateCurrentNote();
           } else {
             setStatus(Settings.STATUS_SAVING, e.progress_value);
@@ -197,12 +198,27 @@ $(document).ready(function() {
       if (note_title) {
         sendTitle({note_id: current_note, title: note_title});
       }
+      disableOn("note-save");
       [].forEach.call(chunks, function(chunk, i) {
         sendChunk({chunk: chunk, pos: i, note_id: current_note}, chunks.length);
       });
       if (typeof callback === 'function') {
         callback();
       }
+    }
+
+    function disableOn(event) {
+      var disable_listeners = document.querySelectorAll('[disable-on="' + event + '"]');
+      [].forEach.call(disable_listeners, function(dl) {
+        dl.classList.add('busy');
+      });
+    }
+
+    function enableOnEnd(event) {
+      var disable_listeners = document.querySelectorAll('[disable-on="' + event + '"]');
+      [].forEach.call(disable_listeners, function(dl) {
+        dl.classList.remove('busy');
+      });
     }
 
     function saveNote(hide_notification, callback) {
@@ -264,7 +280,7 @@ $(document).ready(function() {
 
       var typing_timer;
       var editor_done_typing_timeout = 1000;
-      var input_done_typing_timeout = 0;
+      var input_done_typing_timeout = 1000;
 
       editor_cont.onkeyup = function(e) {
         clearTimeout(typing_timer);
@@ -355,6 +371,11 @@ $(document).ready(function() {
     }
 
     function setSelectedNote(id) {
+      var unselect = false;
+      if (id == null) {
+        unselect = true;
+        id = current_note;
+      }
       var query = '[note-container="' + id + '"]';
       var note_container = document.querySelector(query);
       var note_containers = document.querySelectorAll('[note-container]');
@@ -363,12 +384,16 @@ $(document).ready(function() {
         return;
       }
       [].forEach.call(note_containers, function(nc) {
-        if (nc.getAttribute('note-container') != id) {
+        if (nc.getAttribute('note-container') != id || unselect) {
           nc.removeAttribute('theme-color-listener');
         }
       });
-      var color = Settings.fetch('theme-color');
-      note_container.setAttribute('theme-color-listener', color);
+      if (!unselect) {
+        var color = Settings.fetch('theme-color');
+        note_container.setAttribute('theme-color-listener', color);
+      } else {
+        console.log("Unselecting %s!", id);
+      }
       Settings.updateThemeColorFor('theme-color-listener', 'note-container');
     }
 
@@ -435,7 +460,6 @@ $(document).ready(function() {
        if (e !== undefined) {
         e.preventDefault();
        }
-       current_note = null;
        editor_cont.classList.add("hide");
        showInitMessage(note_listeners);
        $('#editor-container > .ql-editor').html("");
@@ -443,6 +467,8 @@ $(document).ready(function() {
        note_mgmt_btn.setAttribute("state", "new");
        note_mgmt_btn.setAttribute('title', 'Create a new note');
        hideNoteOptions();
+       setSelectedNote(null);
+       current_note = null;
        Settings.clear('last-selected-note');
     }
 
