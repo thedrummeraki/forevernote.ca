@@ -144,7 +144,7 @@ class User < ApplicationRecord
             self.save
         end
         notes = self.notes.reject { |n| n[:id].nil? }
-        notes.sort_by {|n| n[:title] || n[:id]}
+        #notes.sort_by {|n| n[:title] || n[:id]}
         #res = []
         #notes.each do |note|
         #    contnt = note[:note]
