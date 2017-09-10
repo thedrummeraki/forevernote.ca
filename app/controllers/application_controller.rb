@@ -12,6 +12,45 @@ class ApplicationController < ActionController::Base
     redirect_to '/editor' if logged_in?
   end
 
+  def password_reset
+    if logged_in?
+      redirect_to '/'
+    else
+      render 'password_reset'
+    end
+  end
+
+  def password_reset_step_1
+    user = User.find_by(email_address: params[:email_address])
+    exists = !user.nil?
+    if exists
+      exists = user.gen_recovery_hash
+    end
+    email = user.email_address unless user.nil?
+    render :json => {success: exists, email_address: email}
+  end
+
+  def password_reset_step_2
+    user = User.find_by(email_address: params[:email_address])
+    code = params[:hash_code]
+    valid = !user.nil?
+    if valid
+      valid = user.compare_code code
+    end
+    render :json => {success: valid, email_address: user.email_address}
+  end
+
+  def password_reset_step_3
+    user = User.find_by(email_address: params[:email_address])
+    password = params[:password]
+    password_confirmation = params[:password_confirmation]
+    valid = !user.nil?
+    if valid && password_confirmation == password
+      valid = user.update_attributes password: password, password_confirmation: password_confirmation
+    end
+    render :json => {success: valid}
+  end
+
   def register
     if logged_in?
       redirect_to '/'
@@ -21,8 +60,10 @@ class ApplicationController < ActionController::Base
   end
 
   def check_login
-    username = params[:one].strip.downcase
-    password = params[:two].strip
+    username = params[:one] || params[:username] || params[:email_address]
+    password = params[:two] || params[:password]
+
+    username = username.strip.downcase
 
     render json: {message: "Hey, we can't log you in if you are silent!"} if username.size == 0 && password.size == 0
     render json: {message: "You forgot your username!"} if password.size > 0 && username.size == 0
@@ -31,6 +72,9 @@ class ApplicationController < ActionController::Base
     return if username.size == 0 || password.size == 0
 
     user = User.find_by(username: username.downcase)
+    if user.nil?
+      user = User.find_by(email_address: username.downcase)
+    end
     unless user.nil?
         if user.authenticate(password)
             unless user.is_activated?

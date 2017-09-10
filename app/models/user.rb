@@ -198,5 +198,26 @@ class User < ApplicationRecord
         !self.is_activated.nil? && self.is_activated == true
     end
 
+    def gen_recovery_hash
+        new_recovery_hash = self.username.to_s + self.email_address.to_s + Time.now.to_s + self.registration_hash.to_s
+        already_requested = !self.recovery_hash.nil?
+        self.recovery_hash = OpenSSL::Digest::SHA256.new(new_recovery_hash)
+        res = true
+        unless already_requested
+            res = save
+            EmailSender.send_recovery_email self
+        end
+        res
+    end
+
+    def compare_code code
+        valid = code == self.recovery_hash
+        if valid
+            self.recovery_hash = nil
+            valid = self.save
+        end
+        valid
+    end
+
     has_secure_password
 end

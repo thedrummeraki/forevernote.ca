@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170902163420) do
+ActiveRecord::Schema.define(version: 20170910144825) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20170902163420) do
     t.string   "password_digest"
     t.string   "registration_hash"
     t.boolean  "is_activated"
+    t.string   "recovery_hash"
   end
 
 end

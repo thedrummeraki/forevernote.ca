@@ -4,6 +4,10 @@ Rails.application.routes.draw do
   post '/login' => 'application#check_login'
   get '/logout' => 'users#logout'
 
+  get '/password-reset' => 'application#password_reset'
+  get '/password-reset/check-email' => 'application#password_reset_step_1'
+  get '/password-reset/check-code' => 'application#password_reset_step_2'
+  get '/password-reset/check-passwords' => 'application#password_reset_step_3'
   get '/register' => 'application#register'
   get '/registered' => 'application#registered'
   get '/success' => 'application#success'

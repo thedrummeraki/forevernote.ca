@@ -55,6 +55,32 @@ class EmailSender
       html = html.join ''
       send_email(user.email_address, body: html, subject: 'ForeverNote - Welcome')
     end
+
+    def self.send_recovery_email user
+      recovery_hash = user.recovery_hash
+      html = [
+        '<h2>New password at ForeverNote</h2>',
+        '<p>',
+          "Hi there, #{user.get_name}! <br>You are reading this ",
+          "email because you have requested a new password using the email ",
+          '<a href=\'' + user.email_address + '\'>',
+          user.email_address,
+          '</a>. If this is not you, please ignore this email and change your password in your account settings.',
+          '<br/>',
+          '<br/>',
+          'If this is you, then here is the 32-alphanumeric code necessary for your password recovery:',
+          '<br>',
+          '<br>',
+          '<b>' + recovery_hash + '</b>',
+          '<br>',
+          '<br>',
+          'Thank you and have a good day,',
+          '<p>ForeverNote (<a href="mailto:' + FOREVERNOTE_EMAIL + '">' + FOREVERNOTE_EMAIL + '</a>)',
+        '<p>'
+      ]
+      html = html.join ''
+      send_email(user.email_address, body: html, subject: 'ForeverNote - Password recovery request')
+    end
 end
 
 # send_email "aakin013@uottawa.ca", :body => "This was easy to send"
