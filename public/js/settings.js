@@ -15,6 +15,9 @@ var Settings = (function() {
         10: {text: 'Your note was successfully deleted.', color: 'green'},
         11: {text: 'It seems this was already deleted!', color: 'orange'},
     };
+
+    var allNotes = null;
+
     const MY_CHUNK_SIZE = 1000;
     var default_settings = {
         "save-auto": false,
@@ -25,8 +28,78 @@ var Settings = (function() {
         "download-format": "html",
         "theme-color": "blue"
     };
+
     var init = false;
     var settings = {};
+
+    var hasNote = function(id) {
+        var res = false;
+        [].forEach.call(allNotes, function(current_note) {
+            if (current_note.id == id) {
+                res = true;
+            }
+        });
+        return res;
+    }
+
+    var saveNotes = function(notes) {
+        temp_notes = notes;
+        allNotes = [];
+        [].forEach.call(temp_notes, function(tmp_note) {
+            if (tmp_note.title && tmp_note.id && tmp_note.chunks) {
+                if (!hasNote(tmp_note.id)) {
+                    allNotes.push(tmp_note);
+                }
+            }
+        });
+    }
+
+    var getSavedNotes = function() {
+        return allNotes;
+    }
+
+    var verifyCachedNote = function(chunk) {
+        var found_note = null;
+        var res = true;
+        [].forEach.call(getSavedNotes(), function(cached_note) {
+            if (chunk.note_id == cached_note.id) {
+                found_note = cached_note;
+            }
+            if (found_note != null) {
+                // If the chunk's position is greater that the posible length of
+                // the cached, then this chunk is not at its original place.
+                if (chunk.pos >= found_note.chunks.length) {
+                    res = true;
+                    return;
+                }
+
+                var found_chunk = found_note.chunks[chunk.pos];
+                res = found_chunk.content != chunk.chunk;
+                return;
+            }
+        });
+        if (found_note == null && res) {
+            console.log("This note is not cached and may not exist on the server side.");
+        }
+        return res;
+    }
+
+    var createChunks = function(str) {
+        return convertStringToArray(str, MY_CHUNK_SIZE);
+    }
+
+    function convertStringToArray(str, maxPartSize){
+      const chunkArr = [];
+      let leftStr = str;
+      do {
+
+        chunkArr.push(leftStr.substring(0, maxPartSize));
+        leftStr = leftStr.substring(maxPartSize, leftStr.length);
+
+      } while (leftStr.length > 0);
+
+      return chunkArr;
+    };
 
     var getJSON = function() {
         return settings;
@@ -163,8 +236,10 @@ var Settings = (function() {
         getStatus: getStatus,
         updateThemeColorFor: updateThemeColorFor,
         toJSON: getJSON,
-
-        CHUNK_SIZE: MY_CHUNK_SIZE,
+        initCachedNotes: saveNotes,
+        getCachedNotes: getSavedNotes,
+        verifyCachedNote: verifyCachedNote,
+        chunkify: createChunks,
 
         STATUS_ERROR: "-1",
         STATUS_INIT: 0,

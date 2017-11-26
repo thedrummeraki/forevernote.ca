@@ -39,6 +39,10 @@ class NotesController < AuthenticatedController
     #render json: {success: !new_id.nil?, note_id: new_id, chunk: contents}
   end
 
+  def patch_save_chunk
+    id = params[:note_id]
+  end
+
   def save_note
     contents = params[:content]
     id = params[:note_id]
@@ -113,6 +117,13 @@ class NotesController < AuthenticatedController
     keyword = params[:keyword]
     is_b64 = params[:b64]
     is_uri = params[:uri]
+    
+    as_chunks = params[:as_chunks]
+    if as_chunks == "true"
+      render json: {notes: current_user.get_notes} 
+      return
+    end
+
     if keyword
       if is_b64 == "true"
         begin

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   get '/get/notes' => 'notes#get_notes'
   post '/save/note' => 'notes#save_note'
   post '/send/chunk' => 'notes#save_chunk'
+  patch '/update/chunk' => 'notes#update_chunk'
   delete '/delete/note' => 'notes#delete_note'
   patch '/save/note/title' => 'notes#save_note_title'
 

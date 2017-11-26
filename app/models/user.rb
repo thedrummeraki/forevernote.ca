@@ -144,7 +144,7 @@ class User < ApplicationRecord
             self.save
         end
         notes = self.notes.reject { |n| n[:id].nil? }
-        #notes.sort_by {|n| n[:title] || n[:id]}
+        notes.sort_by {|n| n[:title] || n[:id]}
         #res = []
         #notes.each do |note|
         #    contnt = note[:note]
@@ -169,7 +169,7 @@ class User < ApplicationRecord
             notes.push(get_note(note_id))
         end
         save if clean_up_empty
-        notes
+        notes.index_by {|r| r[:id]}.values
     end
 
     def gen_id id=nil

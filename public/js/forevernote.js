@@ -169,30 +169,66 @@ $(document).ready(function() {
         }
       });
     }
-    function sendChunk(chunk_obj, quantity) {
+    function _sendChunk(chunk_obj, options) {
+      var url = options.url;
+      var method = options.method || 'post';
+      var async = options.async || false;
+      var data = options.data;
+      var success = options.functions.success || null;
+      var error = options.functions.error || function(a, b, c) {
+          console.error("Error for chunk n#%d", chunk_obj.pos);
+          console.error(a);
+          console.error(b);
+          console.error(c);
+      };
       $.ajax({
+        url: url,
+        method: method,
+        async: async,
+        data: data,
+        success: success,
+        error: error
+      });
+    }
+    function sendChunk(chunk_obj, quantity) {
+      var options = {
         url: '/send/chunk?quantity=' + quantity + '&chunk=' + chunk_obj.chunk + '&pos=' + chunk_obj.pos + '&note_id=' + current_note,
-        method: 'post',
-        async: false,
+        async: true,
         success: function(e) {
           console.log(e.chunk == chunk_obj.chunk);
           if (e.done) {
             console.log("All chunks were sent.");
             setStatus(Settings.STATUS_SAVED);
-            enableOnEnd("note-save");
             updateCurrentNote();
           } else {
             setStatus(Settings.STATUS_SAVING, e.progress_value);
           }
-        },
-        error: function(a, b, c) {
-          console.error("Error for chunk n#%d", chunk_obj.pos);
-          console.error(a);
-          console.error(b);
-          console.error(c);
         }
-      });
+      }
+      _sendChunk(chunk_obj, quantity);
     }
+    function updateChunk(chunk_obj, is_last) {
+      is_last = is_last ? "true" : "false";
+      var options = {
+        url: '/update/chunk?chunk=' + chunk_obj.chunk + '&pos=' + chunk_obj.pos + '&note_id=' + current_note + '&is_last=' + is_last,
+        async: true,
+        method: 'patch',
+        functions: {
+            success: function(e) {
+            console.log(e.chunk == chunk_obj.chunk);
+            if (is_last) {
+              console.log("All chunks were sent.");
+              setStatus(Settings.STATUS_SAVED);
+              updateCurrentNote();
+            } else {
+              setStatus(Settings.STATUS_SAVING, e.progress_value);
+            }
+          }
+        }
+      }
+      _sendChunk(chunk_obj, options);
+    }
+
     function sendChunks(chunks, callback) {
       var note_title = document.getElementById('note-title-value');
       note_title = note_title.value.trim();
@@ -200,9 +236,20 @@ $(document).ready(function() {
         sendTitle({note_id: current_note, title: note_title});
       }
       disableOn("note-save");
+      var chunks_to_update = [];
       [].forEach.call(chunks, function(chunk, i) {
-        sendChunk({chunk: chunk, pos: i, note_id: current_note}, chunks.length);
+        var chunk_obj = {chunk: chunk, pos: i, note_id: current_note};
+        if (Settings.verifyCachedNote(chunk_obj)) {
+          chunks_to_update.push(chunk_obj);
+        }
       });
+      [].forEach.call(chunks_to_update, function(chunk, i) {
+        var chunk_obj = {chunk: chunk, pos: i, note_id: current_note};
+        updateChunk(chunk_obj, i == chunks_to_update.size-1);
+        console.log("Sending chunk " + chunk_obj.pos);
+      });
+      enableOnEnd("note-save");
+      setStatus(Settings.STATUS_SAVED);
       if (typeof callback === 'function') {
         callback();
       }
@@ -231,10 +278,9 @@ $(document).ready(function() {
       var new_content = $('#editor-container > .ql-editor').html();
       new_content = safeEncode(new_content);
       var length = new_content.length;
-      console.log(new_content);
-      new_content = convertStringToArray(new_content, Settings.CHUNK_SIZE);
-      console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
+      new_content = Settings.chunkify(new_content);
 
+      console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
       sendChunks(new_content, callback);
     }
     $(document).keydown(function(e) {
@@ -565,6 +611,18 @@ $(document).ready(function() {
       });
     }
 
+    function cacheNotesAsChunks(callback) {
+      $.ajax({
+        url: '/get/notes?as_chunks=true',
+        success: function(e) {
+          Settings.initCachedNotes(e.notes);
+          if (callback) {
+            callback(document.querySelectorAll("[note-container]"));
+          }
+        }
+      });
+    }
+
     function getNotes(keyword, showLastSelectedNote, callback) {
       var cont = document.getElementById("notes-list-side");
       var url = '/get/notes';
@@ -592,9 +650,7 @@ $(document).ready(function() {
             if (current_note) {
               setSelectedNote(current_note);
             }
-            if (callback) {
-              callback(document.querySelectorAll("[note-container]"));
-            }
+            cacheNotesAsChunks(callback);
           }
         }
       });
