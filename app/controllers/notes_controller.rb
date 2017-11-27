@@ -22,7 +22,7 @@ class NotesController < AuthenticatedController
         contents = params[:chunk]
         idx = params[:pos].to_i
         quantity = params[:quantity].to_i
-        if idx < -1
+        if idx < 0
           render json: {success: false, message: "Invalid note index."}
           return
         end
@@ -37,6 +37,24 @@ class NotesController < AuthenticatedController
     render json: {success: true, note_id: id, chunk: contents, tmp_chunks: tmp_chunks, progress_value: progress_value, done: done}
     #new_id = current_user.save_chunk(contents, id, idx, true)
     #render json: {success: !new_id.nil?, note_id: new_id, chunk: contents}
+  end
+
+  def update_chunk
+    chunk = params[:chunk].to_s
+    pos = params[:pos].to_i
+    note_id = params[:note_id]
+    is_last = params[:is_last]
+
+    unless chunk.empty? || note_id.empty? || pos < 0
+      success = save_tmp_chunk_to_update chunk, note_id, pos
+      render json: {success: success, chunk: chunk}
+    else
+      render json: {success: false, chunk: nil, message: "No chunks were received, no id was specified or invalid position!"}
+    end
+  end
+
+  def reset_chunks_update
+    render json: {success: reset_tmp_chunks_update(current_user)}
   end
 
   def patch_save_chunk

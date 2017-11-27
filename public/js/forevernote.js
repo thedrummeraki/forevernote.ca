@@ -20,6 +20,9 @@ $(document).ready(function() {
     var total_size = null;
     var editor = null;
 
+    var chunks_to_send_count = null;
+    var sent_chunks_count = null;
+
     close_note.onclick = hideCurrentNote;
     add_note.onclick = hideCurrentNoteAndNewNote;
 
@@ -195,8 +198,7 @@ $(document).ready(function() {
         url: '/send/chunk?quantity=' + quantity + '&chunk=' + chunk_obj.chunk + '&pos=' + chunk_obj.pos + '&note_id=' + current_note,
         async: true,
         success: function(e) {
-          console.log(e.chunk == chunk_obj.chunk);
-          if (e.done) {
+          if (is_last) {
             console.log("All chunks were sent.");
             setStatus(Settings.STATUS_SAVED);
             updateCurrentNote();
@@ -207,22 +209,22 @@ $(document).ready(function() {
       }
       _sendChunk(chunk_obj, quantity);
     }
+
     function updateChunk(chunk_obj, is_last) {
+      console.log("we are sending: ");
+      console.log(chunk_obj);
       is_last = is_last ? "true" : "false";
       var options = {
-        url: '/update/chunk?chunk=' + chunk_obj.chunk + '&pos=' + chunk_obj.pos + '&note_id=' + current_note + '&is_last=' + is_last,
-        async: true,
+        url: '/update/chunk?chunk=' + chunk_obj.chunk + '&pos=' + chunk_obj.pos + '&note_id=' + current_note,
         method: 'patch',
         functions: {
-            success: function(e) {
-            console.log(e.chunk == chunk_obj.chunk);
-            if (is_last) {
-              console.log("All chunks were sent.");
-              setStatus(Settings.STATUS_SAVED);
-              updateCurrentNote();
+          success: function(e) {
+            if (sent_chunks_count == null) {
+              sent_chunks_count = 0;
             } else {
-              setStatus(Settings.STATUS_SAVING, e.progress_value);
+              sent_chunks_count++;
             }
+            checkIsAllWasSent();
           }
         }
       }
@@ -243,15 +245,40 @@ $(document).ready(function() {
           chunks_to_update.push(chunk_obj);
         }
       });
+      chunks_to_send_count = chunks_to_update.length;
       [].forEach.call(chunks_to_update, function(chunk, i) {
-        var chunk_obj = {chunk: chunk, pos: i, note_id: current_note};
-        updateChunk(chunk_obj, i == chunks_to_update.size-1);
-        console.log("Sending chunk " + chunk_obj.pos);
+        updateChunk(chunk, i == chunks_to_update.size-1);
+        console.log("Sending chunk " + chunk.pos);
       });
       enableOnEnd("note-save");
       setStatus(Settings.STATUS_SAVED);
       if (typeof callback === 'function') {
         callback();
+      }
+    }
+
+    function checkIsAllWasSent() {
+      if (chunks_to_send_count == null) {
+        console.warn("The chunks to send count was not defined...");
+        return;
+      }
+      if (sent_chunks_count == null) {
+        console.warn("The sent chunks count was not properly updated...");
+        return;
+      }
+      console.log("Getting there...");
+      if (sent_chunks_count == chunks_to_send_count) {
+        console.log("looks like we're done! confirming...");
+        $.ajax({
+          url: '/save/tmp/chunks',
+          method: 'delete',
+          success: function(e) {
+            updateCurrentNote();
+            setStatus(Settings.STATUS_SAVED);
+          }
+        });
+      } else {
+        setStatus(Settings.STATUS_SAVING);
       }
     }
 

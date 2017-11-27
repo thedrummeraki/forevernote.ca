@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   post '/send/chunk' => 'notes#save_chunk'
   patch '/update/chunk' => 'notes#update_chunk'
   delete '/delete/note' => 'notes#delete_note'
+  delete '/save/tmp/chunks' => 'notes#reset_chunks_update'
   patch '/save/note/title' => 'notes#save_note_title'
 
   get '/note/download/as_text' => 'notes#download_text'

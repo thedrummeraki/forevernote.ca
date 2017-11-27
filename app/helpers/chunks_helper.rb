@@ -4,7 +4,7 @@ module ChunksHelper
 
     class ChunksManager
         include Singleton
-        attr_accessor :tmp_chunks, :tmp_title
+        attr_accessor :tmp_chunks, :tmp_title,
         def save_tmp_chunk text, id, idx, quantity, current_user
             unless @tmp_chunks
                 @tmp_chunks = []
@@ -13,6 +13,28 @@ module ChunksHelper
             @tmp_chunks.push({pos: idx, content: text, note_id: id})
             return save_and_clean(current_user, id) if idx + 1 == quantity
             return false
+        end
+
+        def save_tmp_chunk_to_update text, id, idx
+            @tmp_chunks_update = [] if @tmp_chunks_update.nil?
+            @tmp_chunks_update.push ({pos: idx, content: text, note_id: id})
+            true
+        end
+
+        def reset_tmp_chunks_update current_user
+            ids = []
+            @tmp_chunks_update.each do |tmp_chunk|
+                ids << tmp_chunk[:note_id] unless ids.include? tmp_chunk[:note_id]
+            end
+            ids.each do |note_id|
+                note = current_user.get_note_inst_by_id note_id
+                raise Exception.new "This note with id #{note_id} does not exist." if note.nil?
+
+                
+            end
+            note[:chunks] = @tmp_chunks_update
+            @tmp_chunks_update = nil
+            true
         end
 
         def save_tmp_chunk_title title, id
@@ -63,12 +85,20 @@ module ChunksHelper
         ChunksManager.instance.save_tmp_chunk(text, id, idx, quantity, current_user)
     end
 
+    def save_tmp_chunk_to_update text, id, idx
+        ChunksManager.instance.save_tmp_chunk_to_update text, id, idx
+    end
+
     def save_tmp_chunk_title title, id
         ChunksManager.instance.save_tmp_chunk_title(title, id)
     end
 
     def tmp_chunks
         ChunksManager.instance.tmp_chunks
+    end
+
+    def reset_tmp_chunks_update current_user
+        ChunksManager.instance.reset_tmp_chunks_update current_user
     end
 
     def build_all_tmp_chunks
