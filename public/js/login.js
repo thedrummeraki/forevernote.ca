@@ -33,6 +33,14 @@ function login() {
                 submit_btn.classList.add("disabled");
                 window.location.href = "/editor";
             }
+        },
+        error: function(e, a, b) {
+            loader.classList.add("hide");
+            submit_btn.classList.remove("hide");
+
+            label.setAttribute("data-error", "Sorry, we coundn't log you in (" + b + "). Please try again.");
+            username.classList.add("invalid");
+            password.classList.remove("valid");
         }
     });
 }

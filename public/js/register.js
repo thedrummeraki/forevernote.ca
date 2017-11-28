@@ -5,6 +5,8 @@ function register() {
     var cpasswordInput = document.getElementById("cpassword");
     var emailInput = document.getElementById("email");
     var nameInput = document.getElementById("name");
+    var registerButton = document.getElementById("register-btn");
+    var loader = document.getElementById("loader");
 
     var success = true;
     [].forEach.call([usernameInput, passwordInput, cpasswordInput, emailInput], function(input) {
@@ -35,10 +37,16 @@ function register() {
         data = data.concat("&name=" + nameInput.value);
         data = data.concat("&email=" + emailInput.value);
 
+        loader.classList.remove("hide");
+        registerButton.classList.add("hide");
+
         $.ajax({
             method: 'post',
             url: '/register?' + data,
             success: function(e) {
+                loader.classList.add("hide");
+                registerButton.classList.remove("hide");
+
                 if (e.success) {
                     window.location.href = e.url;
                 } else {
@@ -51,6 +59,13 @@ function register() {
                         elem.classList.add('invalid');
                     });
                 }
+            },
+            error: function(e) {
+                Materialize.toast("Sorry, there was an error on our side. Please try again.", 3000);
+
+                loader.classList.add("hide");
+                registerButton.classList.remove("hide");
+                usernameInput.focus();
             }
         });
     }
