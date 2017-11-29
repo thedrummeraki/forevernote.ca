@@ -22,19 +22,30 @@ module ChunksHelper
         end
 
         def reset_tmp_chunks_update current_user
-            ids = []
+            id = nil
             @tmp_chunks_update.each do |tmp_chunk|
-                ids << tmp_chunk[:note_id] unless ids.include? tmp_chunk[:note_id]
+                id = tmp_chunk[:note_id]
+                break unless id.nil?
             end
-            ids.each do |note_id|
-                note = current_user.get_note_inst_by_id note_id
-                raise Exception.new "This note with id #{note_id} does not exist." if note.nil?
 
-                
-            end
+            raise Exception.new "No id was provided within the chunk" if id.nil?
+
+            note = current_user.get_note_inst_by_id id
+            raise Exception.new "No note with id #{id} was found." if note.nil?
+
             note[:chunks] = @tmp_chunks_update
             @tmp_chunks_update = nil
-            true
+            pos = current_user.get_note_pos id
+            unless pos < 0
+                current_user.notes[pos] = note
+            else
+                current_user.notes.push note
+            end
+            save_ok = current_user.save
+            unless save_ok
+                p "Couldn't save the notes! Errors: #{current_user.errors}"
+            end
+            save_ok
         end
 
         def save_tmp_chunk_title title, id

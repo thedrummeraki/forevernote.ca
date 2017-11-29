@@ -75,7 +75,7 @@ $(document).ready(function() {
       var note_statuses = document.querySelectorAll("[note-status]");
       var status = Settings.getStatus(value);
       if (status === undefined || status === null) {
-        console.warn("invalid status %d", value);
+        // console.warn("invalid status %d", value);
         return;
       }
       [].forEach.call(note_statuses, function(note_status) {
@@ -105,7 +105,7 @@ $(document).ready(function() {
       var direct_downloads = document.querySelectorAll("[direct-download]");
       [].forEach.call(direct_downloads, function(dd) {
         dd.onclick = function(e) {
-          console.log("click")
+          // console.log("click")
           e.preventDefault();
           saveNote(true, function() {
             var format = dd.getAttribute('direct-download');
@@ -147,14 +147,14 @@ $(document).ready(function() {
     function saveNoteTitle(callback) {
       var note_title = document.getElementById('note-title-value');
       note_title = note_title.value;
-      console.log("Title: " + note_title);
+      // console.log("Title: " + note_title);
       // note_title = btoa(note_title);
       var url = '/save/note/title?title=' + note_title + '&note_id=' + current_note
       $.ajax({
         url: url,
         method: 'patch',
         success: function(e) {
-          console.log(e);
+          // console.log(e);
           if (e.success && callback) {
             callback();
           }
@@ -168,7 +168,7 @@ $(document).ready(function() {
         method: 'post',
         async: false,
         success: function(e) {
-          console.log(e.message);
+          // console.log(e.message);
         }
       });
     }
@@ -179,10 +179,10 @@ $(document).ready(function() {
       var data = options.data;
       var success = options.functions.success || null;
       var error = options.functions.error || function(a, b, c) {
-          console.error("Error for chunk n#%d", chunk_obj.pos);
-          console.error(a);
-          console.error(b);
-          console.error(c);
+          // console.error("Error for chunk n#%d", chunk_obj.pos);
+          // console.error(a);
+          // console.error(b);
+          // console.error(c);
       };
       $.ajax({
         url: url,
@@ -199,7 +199,7 @@ $(document).ready(function() {
         async: true,
         success: function(e) {
           if (is_last) {
-            console.log("All chunks were sent.");
+            // console.log("All chunks were sent.");
             setStatus(Settings.STATUS_SAVED);
             updateCurrentNote();
           } else {
@@ -211,8 +211,8 @@ $(document).ready(function() {
     }
 
     function updateChunk(chunk_obj, is_last) {
-      console.log("we are sending: ");
-      console.log(chunk_obj);
+      // console.log("we are sending: ");
+      // console.log(chunk_obj);
       is_last = is_last ? "true" : "false";
       var options = {
         url: '/update/chunk?chunk=' + chunk_obj.chunk + '&pos=' + chunk_obj.pos + '&note_id=' + current_note,
@@ -220,7 +220,7 @@ $(document).ready(function() {
         functions: {
           success: function(e) {
             if (sent_chunks_count == null) {
-              sent_chunks_count = 0;
+              sent_chunks_count = 1;
             } else {
               sent_chunks_count++;
             }
@@ -248,7 +248,7 @@ $(document).ready(function() {
       chunks_to_send_count = chunks_to_update.length;
       [].forEach.call(chunks_to_update, function(chunk, i) {
         updateChunk(chunk, i == chunks_to_update.size-1);
-        console.log("Sending chunk " + chunk.pos);
+        // console.log("Sending chunk " + chunk.pos);
       });
       enableOnEnd("note-save");
       setStatus(Settings.STATUS_SAVED);
@@ -259,26 +259,32 @@ $(document).ready(function() {
 
     function checkIsAllWasSent() {
       if (chunks_to_send_count == null) {
-        console.warn("The chunks to send count was not defined...");
+        // console.warn("The chunks to send count was not defined...");
         return;
       }
       if (sent_chunks_count == null) {
-        console.warn("The sent chunks count was not properly updated...");
+        // console.warn("The sent chunks count was not properly updated...");
         return;
       }
-      console.log("Getting there...");
+      // console.log("Getting there... %s ==> %s", sent_chunks_count, chunks_to_send_count);
+      var progress = parseInt((sent_chunks_count / chunks_to_send_count) * 100, 10);
       if (sent_chunks_count == chunks_to_send_count) {
-        console.log("looks like we're done! confirming...");
+        // console.log("looks like we're done! confirming...");
         $.ajax({
           url: '/save/tmp/chunks',
           method: 'delete',
           success: function(e) {
             updateCurrentNote();
+            sent_chunks_count = 0;
             setStatus(Settings.STATUS_SAVED);
+          },
+          error: function(e) {
+            // console.error(e);
+            sent_chunks_count = 0;
           }
         });
       } else {
-        setStatus(Settings.STATUS_SAVING);
+        setStatus(Settings.STATUS_SAVING, progress);
       }
     }
 
@@ -307,7 +313,7 @@ $(document).ready(function() {
       var length = new_content.length;
       new_content = Settings.chunkify(new_content);
 
-      console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
+      // console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
       sendChunks(new_content, callback);
     }
     $(document).keydown(function(e) {
@@ -331,7 +337,7 @@ $(document).ready(function() {
 
     function saveNoteIfSelected() {
       if (current_note) {
-        console.log("Automatically saving the current note...");
+        // console.log("Automatically saving the current note...");
         saveNote(undefined, true);
       }
     }
@@ -439,7 +445,7 @@ $(document).ready(function() {
 
     function highlightSelectedNote() {
       if (!current_note) {
-        console.warn('No selected note.'); return;
+        // console.warn('No selected note.'); return;
       }
       setSelectedNote(current_note);
     }
@@ -454,7 +460,7 @@ $(document).ready(function() {
       var note_container = document.querySelector(query);
       var note_containers = document.querySelectorAll('[note-container]');
       if (!note_container) {
-        console.warn("No note with id " + id + " exists on this interface.");
+        // console.warn("No note with id " + id + " exists on this interface.");
         return;
       }
       [].forEach.call(note_containers, function(nc) {
@@ -466,32 +472,32 @@ $(document).ready(function() {
         var color = Settings.fetch('theme-color');
         note_container.setAttribute('theme-color-listener', color);
       } else {
-        console.log("Unselecting %s!", id);
+        // console.log("Unselecting %s!", id);
       }
       Settings.updateThemeColorFor('theme-color-listener', 'note-container');
     }
 
     function showNote(e, by_id) {
         if (currently_loading) {
-          console.log("Currenlty loading a note...");
+          // console.log("Currenlty loading a note...");
           return;
         }
 
         var id;
         if (e !== undefined && e !== null) {
-          console.warn("Nice way!");
+          // console.warn("Nice way!");
           e.preventDefault();
           var current_elem = this;
           id = current_elem.getAttribute("note-container");
         } else {
-          console.warn("not really..");
+          // console.warn("not really..");
             if (e == null && by_id) {
-                console.warn("...what I wanted...");
+                // console.warn("...what I wanted...");
             }
           id = by_id;
         }
         if (!id) {
-          console.error("Unspecified id.");
+          // console.error("Unspecified id.");
           return;
         }
         Settings.save('last-selected-note', id);
@@ -516,7 +522,7 @@ $(document).ready(function() {
               showNoteOptions();
               focusAtEndQuill();
             } else {
-              console.warn("This note was probably deleted off the server.");
+              // console.warn("This note was probably deleted off the server.");
             }
             setLoading(false, current_elem);
           },
@@ -604,11 +610,11 @@ $(document).ready(function() {
                     var title_sub_cont = sub_container.children[0];
                     var conts_sub_cont = sub_container.children[1];
 
-                    console.log(contents);
+                    // console.log(contents);
                     title_sub_cont.innerHTML = title;
                     conts_sub_cont.innerHTML = contents;
                 } else if (!container) {
-                    console.error("No container for id " + id);
+                    // console.error("No container for id " + id);
                 }
             }
         });
@@ -626,7 +632,7 @@ $(document).ready(function() {
         url: '/get/note?note_id=' + id,
         success: function(e) {
           if (!e.success) {
-            console.warn("This note %s might not exist anymore.", id); return;
+            // console.warn("This note %s might not exist anymore.", id); return;
           }
           note = {id: id, contents: e.contents, title: e.title};
           note = buildNote(note);
@@ -713,9 +719,9 @@ $(document).ready(function() {
           title_input.value = "";
           title_input.focus();
           addNote(current_note);
-          console.log("note added!");
+          // console.log("note added!");
           if (callback) {
-            console.log("Running callback");
+            // console.log("Running callback");
             callback();
           }
         }
@@ -766,7 +772,7 @@ $(document).ready(function() {
     var note_mgmt_icon = document.getElementById("note-mgnt-icon");
     note_mgmt_btn.onclick = function(e) {
         if (note_mgmt_btn.getAttribute("state") == "new") {
-          console.log(editor_cont.classList);
+          // console.log(editor_cont.classList);
           if (editor_cont.classList.contains("hide")) {
           }
           showNewEditor();
@@ -782,14 +788,14 @@ $(document).ready(function() {
       if (e.keyCode == 13 || e.keyCode == 9) {
         e.preventDefault();
         ql_editor[0].focus();
-        console.log(e.keyCode);
-        console.log("on editor...");
+        // console.log(e.keyCode);
+        // console.log("on editor...");
       }
     }
     var editorToTitleInput = function(e) {
       if (e.keyCode == 9 && e.shiftKey) {
         e.preventDefault();
-        console.log("shift key + tab")
+        // console.log("shift key + tab")
       }
     }
     // title_input.onkeyup = titleInputToEditor;
