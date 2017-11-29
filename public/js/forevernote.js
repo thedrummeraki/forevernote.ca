@@ -168,7 +168,7 @@ $(document).ready(function() {
         method: 'post',
         async: false,
         success: function(e) {
-          // console.log(e.message);
+          console.log("Title received message: " + e.message);
         }
       });
     }

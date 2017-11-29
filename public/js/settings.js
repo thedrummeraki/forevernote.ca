@@ -18,7 +18,7 @@ var Settings = (function() {
 
     var allNotes = null;
 
-    const MY_CHUNK_SIZE = 1000;
+    const MY_CHUNK_SIZE = 1500;
     var default_settings = {
         "save-auto": false,
         "logout-after": {
