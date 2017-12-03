@@ -33,6 +33,7 @@ class NotesController < AuthenticatedController
     else
         progress_value = nil
         done = save_tmp_chunk_title title, id
+        p "Self: #{self}"
     end
     render json: {success: true, note_id: id, chunk: contents, tmp_chunks: tmp_chunks, progress_value: progress_value, done: done}
     #new_id = current_user.save_chunk(contents, id, idx, true)

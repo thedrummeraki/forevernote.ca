@@ -245,11 +245,17 @@ $(document).ready(function() {
           chunks_to_update.push(chunk_obj);
         }
       });
-      chunks_to_send_count = chunks_to_update.length;
-      [].forEach.call(chunks_to_update, function(chunk, i) {
-        updateChunk(chunk, i == chunks_to_update.size-1, callback);
-        // console.log("Sending chunk " + chunk.pos);
-      });
+      if (chunks_to_update.length > 0) {
+        chunks_to_send_count = chunks_to_update.length;
+        [].forEach.call(chunks_to_update, function(chunk, i) {
+          updateChunk(chunk, i == chunks_to_update.size-1, callback);
+          // console.log("Sending chunk " + chunk.pos);
+        });
+      } else {
+        // Then all is saved!
+        setStatus(Settings.STATUS_SAVED);
+        enableOnEnd('note-save');
+      }
     }
 
     function checkIsAllWasSent(callback) {
@@ -270,12 +276,14 @@ $(document).ready(function() {
           method: 'delete',
           success: function(e) {
             updateCurrentNote();
-            sent_chunks_count = 0;
-            setStatus(Settings.STATUS_SAVED);
-            if (typeof(callback) === 'function') {
-              callback();
-            }
-            enableOnEnd("note-save");
+            cacheNotesAsChunks(function() {
+              sent_chunks_count = 0;
+              setStatus(Settings.STATUS_SAVED);
+              enableOnEnd("note-save");
+              if (typeof(callback) == 'function') {
+                callback();
+              }
+            });
           },
           error: function(e) {
             // console.error(e);

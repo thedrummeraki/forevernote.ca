@@ -36,7 +36,6 @@ module ChunksHelper
             if !@tmp_title.nil? && !@tmp_title[:note_id].nil? && !@tmp_title[:note_id].nil? && @tmp_title[:note_id] == id
                 note[:title] = @tmp_title[:title]
                 @tmp_title = nil
-                @tmp_title[:note_id]
             end
 
             note[:chunks] = @tmp_chunks_update
