@@ -11,15 +11,15 @@ default: &default
 
 development:
   <<: *default
-  #database: db/development.sqlite3
+  database: db/development.sqlite3
 
 #production:
-  <<: *default
-  adapter: 'postgresql'
-  database: forevernote_development
-  username: akinyele
-  host: 192.168.0.13
-  password: 'toronto' #<%= ENV['MAIN_DATABASE_PASSWORD'] %>
+  #<<: *default
+  #adapter: 'postgresql'
+  #database: forevernote_development
+  #username: akinyele
+  #host: 192.168.0.13
+  #password: 'toronto' #<%= ENV['MAIN_DATABASE_PASSWORD'] %>
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

@@ -210,7 +210,7 @@ $(document).ready(function() {
       _sendChunk(chunk_obj, quantity);
     }
 
-    function updateChunk(chunk_obj, is_last) {
+    function updateChunk(chunk_obj, is_last, callback) {
       // console.log("we are sending: ");
       // console.log(chunk_obj);
       is_last = is_last ? "true" : "false";
@@ -224,7 +224,7 @@ $(document).ready(function() {
             } else {
               sent_chunks_count++;
             }
-            checkIsAllWasSent();
+            checkIsAllWasSent(callback);
           }
         }
       }
@@ -247,17 +247,12 @@ $(document).ready(function() {
       });
       chunks_to_send_count = chunks_to_update.length;
       [].forEach.call(chunks_to_update, function(chunk, i) {
-        updateChunk(chunk, i == chunks_to_update.size-1);
+        updateChunk(chunk, i == chunks_to_update.size-1, callback);
         // console.log("Sending chunk " + chunk.pos);
       });
-      enableOnEnd("note-save");
-      setStatus(Settings.STATUS_SAVED);
-      if (typeof callback === 'function') {
-        callback();
-      }
     }
 
-    function checkIsAllWasSent() {
+    function checkIsAllWasSent(callback) {
       if (chunks_to_send_count == null) {
         // console.warn("The chunks to send count was not defined...");
         return;
@@ -277,10 +272,16 @@ $(document).ready(function() {
             updateCurrentNote();
             sent_chunks_count = 0;
             setStatus(Settings.STATUS_SAVED);
+            if (typeof(callback) === 'function') {
+              callback();
+            }
+            enableOnEnd("note-save");
           },
           error: function(e) {
             // console.error(e);
             sent_chunks_count = 0;
+            setStatus(Settings.STATUS_ERROR);
+            enableOnEnd("note-save");
           }
         });
       } else {
@@ -313,9 +314,10 @@ $(document).ready(function() {
       var length = new_content.length;
       new_content = Settings.chunkify(new_content);
 
-      // console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
-      sendChunks(new_content, callback);
+      console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
+      sendChunks(new_content, function() {console.log("We're done.");});
     }
+
     $(document).keydown(function(e) {
         var key = undefined;
         var possible = [ e.key, e.keyIdentifier, e.keyCode, e.which ];

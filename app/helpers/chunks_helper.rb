@@ -33,7 +33,7 @@ module ChunksHelper
             note = current_user.get_note_inst_by_id id
             raise Exception.new "No note with id #{id} was found." if note.nil?
 
-            if !@tmp_title[:note_id].nil? && !@tmp_title[:note_id].nil? && @tmp_title[:note_id] == id
+            if !@tmp_title.nil? && !@tmp_title[:note_id].nil? && !@tmp_title[:note_id].nil? && @tmp_title[:note_id] == id
                 note[:title] = @tmp_title[:title]
                 @tmp_title = nil
                 @tmp_title[:note_id]
