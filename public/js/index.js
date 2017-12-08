@@ -80,3 +80,9 @@ function setStatus(value, format) {
     }
   });
 }
+
+function tryToCallFunction(callback) {
+  if (typeof(callback) === 'function') {
+    callback();
+  }
+}

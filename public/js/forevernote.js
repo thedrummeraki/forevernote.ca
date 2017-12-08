@@ -19,9 +19,12 @@ $(document).ready(function() {
     var my_editor = $('#editor-container > .ql-editor');
     var total_size = null;
     var editor = null;
+    var first_time_editing_current_note = false;
+    var currently_saving = false;
 
     var note_status_text = document.getElementById("notes-current-status-text");
     var note_status_loader = document.getElementById("notes-current-status-loader");
+    var notes_count = 0;
 
     var chunks_to_send_count = null;
     var sent_chunks_count = null;
@@ -43,21 +46,25 @@ $(document).ready(function() {
 
     function setNoteStatusLoading(isLoading, text) {
       if (isLoading) {
-        note_status_loader.classList.remove("c0");
-        note_status_loader.classList.add("c2");
+        note_status_loader.classList.remove("s0");
+        note_status_loader.classList.add("s2");
         note_status_loader.classList.remove("hide");
-        note_status_text.classList.remove("c12");
-        note_status_text.classList.add("c10");
+        note_status_text.classList.remove("s12");
+        note_status_text.classList.add("s10");
       } else {
-        note_status_loader.classList.add("c0");
-        note_status_loader.classList.remove("c2");
+        note_status_loader.classList.add("s0");
+        note_status_loader.classList.remove("s2");
         note_status_loader.classList.add("hide");
-        note_status_text.classList.add("c12");
-        note_status_text.classList.remove("c10");
+        note_status_text.classList.add("s12");
+        note_status_text.classList.remove("s10");
       }
       if (text) {
         note_status_text.innerHTML = text;
       }
+    }
+
+    function setNoteStatusText(text) {
+      setNoteStatusLoading(false, text);
     }
 
     function setProgress(value) {
@@ -262,6 +269,7 @@ $(document).ready(function() {
         } else {
           // Then all is saved!
           setStatus(Settings.STATUS_SAVED);
+          currently_saving = false;
           enableOnEnd('note-save');
 
           // If there are no chunks to send
@@ -301,6 +309,8 @@ $(document).ready(function() {
             cacheNotesAsChunks(function() {
               sent_chunks_count = 0;
               setStatus(Settings.STATUS_SAVED);
+              currently_saving = false;
+              setNoteStatusLoading(false, "Yay! Perfect.");
               enableOnEnd("note-save");
               if (typeof(callback) === 'function') {
                 callback();
@@ -334,7 +344,13 @@ $(document).ready(function() {
     }
 
     function saveNote(hide_notification, callback) {
+      if (currently_saving) {
+        return;
+      }
+      currently_saving = true;
       setStatus(Settings.STATUS_SAVING);
+      setNoteStatusLoading(true, "We're saving everything...");
+
       if (!hide_notification) {
        setProgress(0);
       }
@@ -343,6 +359,7 @@ $(document).ready(function() {
       new_content = safeEncode(new_content);
       var length = new_content.length;
       new_content = Settings.chunkify(new_content);
+
 
       console.log("Saving note... (" + length + " bytes in chucks of " + new_content.length + ")");
       sendChunks(new_content, callback);
@@ -395,10 +412,12 @@ $(document).ready(function() {
       var input_done_typing_timeout = 1000;
 
       editor_cont.onkeyup = function(e) {
+        setNoteStatusText("CTRL-S to save!");
         clearTimeout(typing_timer);
         typing_timer = setTimeout(done_typing, editor_done_typing_timeout);
       }
       note_title_input.onkeyup = function(e) {
+        setNoteStatusText("CTRL-S to save!");
         clearTimeout(typing_timer);
         typing_timer = setTimeout(done_typing, input_done_typing_timeout); 
       }
@@ -659,7 +678,7 @@ $(document).ready(function() {
       });
     }
 
-    function addNote(id) {
+    function addNote(id, callback) {
       $.ajax({
         url: '/get/note?note_id=' + id,
         success: function(e) {
@@ -672,6 +691,10 @@ $(document).ready(function() {
           cont.innerHTML += note;
           refreshNoteContainers();
           setSelectedNote(id);
+          notes_count += 1;
+
+          setNoteStatusLoading(false, "Your new note is ready to use!");
+          tryToCallFunction(callback);
         }
       });
     }
@@ -706,6 +729,7 @@ $(document).ready(function() {
             } else {
               status_text = "No notes were found.";
             }
+            notes_count = e.notes.length;
             setNoteStatusLoading(false, status_text);
             var notes = "";
             [].forEach.call(e.notes, function(note) {
@@ -727,6 +751,9 @@ $(document).ready(function() {
           } else {
             setNoteStatusLoading(false, "No notes here!");
           }
+        },
+        error: function(e) {
+          setNoteStatusLoading(false, "Uh-oh... Something... went wrong :(");
         }
       });
     }
@@ -743,6 +770,8 @@ $(document).ready(function() {
     }
 
     function showNewEditor(callback) {
+      first_time_editing_current_note = true;
+      setNoteStatusLoading(true, "Adding your new note...");
       setLoading(true);
       $.ajax({
         url: '/create/note',
@@ -760,12 +789,7 @@ $(document).ready(function() {
           var title_input = document.getElementById('note-title-value');
           title_input.value = "";
           title_input.focus();
-          addNote(current_note);
-          // console.log("note added!");
-          if (callback) {
-            // console.log("Running callback");
-            callback();
-          }
+          addNote(current_note, callback);
         }
       });
     }
