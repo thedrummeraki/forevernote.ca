@@ -48,7 +48,7 @@ var Settings = (function() {
         [].forEach.call(temp_notes, function(tmp_note) {
             if (tmp_note.title !== undefined && tmp_note.id && tmp_note.chunks !== undefined) {
                 if (!hasNote(tmp_note.id)) {
-                    console.log("caching note id " + tmp_note.id);
+                    // console.log("caching note id " + tmp_note.id);
                     allNotes.push(tmp_note);
                 }
             }

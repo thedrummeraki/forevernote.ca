@@ -23,22 +23,29 @@ module ChunksHelper
 
         def reset_tmp_chunks_update current_user
             id = nil
-            @tmp_chunks_update.each do |tmp_chunk|
-                id = tmp_chunk[:note_id]
-                break unless id.nil?
+            unless @tmp_chunks_update.nil?
+                @tmp_chunks_update.each do |tmp_chunk|
+                    id = tmp_chunk[:note_id]
+                    break unless id.nil?
+                end
             end
 
+            title_only = id.nil? && !@tmp_title.nil?
+
+            id = @tmp_title[:note_id] if title_only
             raise Exception.new "No id was provided within the chunk" if id.nil?
 
             note = current_user.get_note_inst_by_id id
             raise Exception.new "No note with id #{id} was found." if note.nil?
 
-            if !@tmp_title.nil? && !@tmp_title[:note_id].nil? && !@tmp_title[:note_id].nil? && @tmp_title[:note_id] == id
+            if title_only
+                note[:title] = @tmp_title[:title]
+            elsif !@tmp_title.nil? && !@tmp_title[:note_id].nil? && !@tmp_title[:note_id].nil? && @tmp_title[:note_id] == id
                 note[:title] = @tmp_title[:title]
                 @tmp_title = nil
             end
 
-            note[:chunks] = @tmp_chunks_update
+            note[:chunks] = @tmp_chunks_update unless title_only
             @tmp_chunks_update = nil
             pos = current_user.get_note_pos id
             unless pos < 0
@@ -59,6 +66,8 @@ module ChunksHelper
             end
             @tmp_title[:title] = title
             @tmp_title[:note_id] = id
+            p "TMP title: #{@tmp_title}"
+            true
         end
 
         def save_and_clean current_user, id

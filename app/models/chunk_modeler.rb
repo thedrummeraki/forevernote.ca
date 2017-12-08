@@ -93,6 +93,7 @@ module ChunkModeler
 
     def is_empty_note id
         note = self.get_note id
+        return true if note.nil?
         is_empty = true
         [note[:contents], note[:title]].each do |string|
             if !string.to_s.strip.empty?
