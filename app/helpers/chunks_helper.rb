@@ -48,12 +48,9 @@ module ChunksHelper
             note[:chunks] = @tmp_chunks_update unless title_only
             @tmp_chunks_update = nil
             pos = current_user.get_note_pos id
-            unless pos < 0
-                current_user.notes[pos] = note
-            else
-                current_user.notes.push note
-            end
+            current_user.add_or_update_note id, note
             save_ok = current_user.save
+            
             unless save_ok
                 p "Couldn't save the notes! Errors: #{current_user.errors}"
             end

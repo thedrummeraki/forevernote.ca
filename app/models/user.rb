@@ -33,6 +33,16 @@ class User < ApplicationRecord
         pos
     end
 
+    def add_or_update_note id, note
+        pos = get_note_pos id
+        unless pos < 0
+            current_user.notes[pos] = note
+        else
+            current_user.notes.push note
+        end
+        pos
+    end
+
     def save_note(note, id, get_id=false)
         gen_id id
         pos = self.get_note_pos id
