@@ -20,6 +20,9 @@ $(document).ready(function() {
     var total_size = null;
     var editor = null;
 
+    var note_status_text = document.getElementById("notes-current-status-text");
+    var note_status_loader = document.getElementById("notes-current-status-loader");
+
     var chunks_to_send_count = null;
     var sent_chunks_count = null;
 
@@ -36,6 +39,25 @@ $(document).ready(function() {
 
     function focusAtEndQuill() {
         //editor.setSelection(0, 1);
+    }
+
+    function setNoteStatusLoading(isLoading, text) {
+      if (isLoading) {
+        note_status_loader.classList.remove("c0");
+        note_status_loader.classList.add("c2");
+        note_status_loader.classList.remove("hide");
+        note_status_text.classList.remove("c12");
+        note_status_text.classList.add("c10");
+      } else {
+        note_status_loader.classList.add("c0");
+        note_status_loader.classList.remove("c2");
+        note_status_loader.classList.add("hide");
+        note_status_text.classList.add("c12");
+        note_status_text.classList.remove("c10");
+      }
+      if (text) {
+        note_status_text.innerHTML = text;
+      }
     }
 
     function setProgress(value) {
@@ -667,6 +689,7 @@ $(document).ready(function() {
     }
 
     function getNotes(keyword, showLastSelectedNote, callback) {
+      setNoteStatusLoading(true, "Looking up...");
       var cont = document.getElementById("notes-list-side");
       var url = '/get/notes';
       if (keyword) {
@@ -677,6 +700,13 @@ $(document).ready(function() {
         method: 'get',
         success: function(e) {
           if (e.notes) {
+            var status_text;
+            if (e.notes.length) {
+              status_text = e.notes.length == 1 ? "Found one note." : "Found " + e.notes.length + " notes.";
+            } else {
+              status_text = "No notes were found.";
+            }
+            setNoteStatusLoading(false, status_text);
             var notes = "";
             [].forEach.call(e.notes, function(note) {
               if (note == null) {
@@ -694,6 +724,8 @@ $(document).ready(function() {
               setSelectedNote(current_note);
             }
             cacheNotesAsChunks(callback);
+          } else {
+            setNoteStatusLoading(false, "No notes here!");
           }
         }
       });

@@ -36,9 +36,9 @@ class User < ApplicationRecord
     def add_or_update_note id, note
         pos = get_note_pos id
         unless pos < 0
-            current_user.notes[pos] = note
+            self.notes[pos] = note
         else
-            current_user.notes.push note
+            self.notes.push note
         end
         pos
     end

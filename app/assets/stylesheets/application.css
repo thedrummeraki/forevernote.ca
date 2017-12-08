@@ -269,6 +269,19 @@ li.search .search-wrapper i.material-icons {
   margin-top: -1px;
 }
 
+.notes-status {
+  text-align: center;
+  padding: 5px 10px;
+  margin: 0;
+  font-size: 10px;
+  line-height: 12px !important;
+}
+
+.note-status.preloader-wrapper.small {
+  height: 12px;
+  width: 12px;
+}
+
 .editor {
     /* left: 480px;
     margin-right: 480px; */
