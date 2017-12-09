@@ -5,7 +5,7 @@ module ApplicationHelper
     end
 
     def logged_in?
-        !current_user.nil?
+        !current_user.nil? && current_user.is_activated?
     end
 
     def log_in(user)
