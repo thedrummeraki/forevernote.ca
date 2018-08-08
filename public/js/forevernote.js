@@ -289,7 +289,7 @@ $(document).ready(function() {
       }
       note_title_input.onkeyup = function(e) {
         clearTimeout(typing_timer);
-        typing_timer = setTimeout(done_typing, input_done_typing_timeout); 
+        typing_timer = setTimeout(done_typing, input_done_typing_timeout);
       }
 
       var saveNoteEvent = function(e) {
@@ -299,7 +299,7 @@ $(document).ready(function() {
         }
         clearTimeout(typing_timer);
       }
-      
+
       editor_cont.onkeydown = saveNoteEvent;
       note_title_input.onkeydown = saveNoteEvent;
 
@@ -488,16 +488,14 @@ $(document).ready(function() {
       title = note.title || "- Untitled -";
       note = extractContent(note.contents);
       note = safeDecode(note, true);
-      if (note.length > 25) {
-        note = note.substring(0, 25) + "<i>[...]</i>";
-      } else if (note.trim().length == 0) {
+      if (note.trim().length == 0) {
         note = "<i>Empty</i>";
       }
       return [
         '<a note-container="' + id + '" href="#" class="note-container waves-effect waves-light">',
           '<div class="row">',
             '<b>' + title + '</b>',
-            '<p style="margin: 0; margin-top: -20px; padding: 0;" class="note-content">' + note + '</p>',
+            '<p style="margin: 0; margin-top: -20px; padding: 0;" class="note-content truncate">' + note + '</p>',
           '</div>',
         '</a>'
       ].join("");
@@ -522,9 +520,7 @@ $(document).ready(function() {
 
                     contents = extractContent(contents);
                     contents = safeDecode(contents, true);
-                    if (contents.length > 25) {
-                        contents = contents.substring(0, 25) + "<i>[...]</i>";
-                    } else if (contents.trim().length == 0) {
+                    if (contents.trim().length == 0) {
                         contents = "<i>Empty</i>";
                     }
                     var sub_container = container.children[0];
